@@ -10,4 +10,4 @@ RUN go build -o otero ./...
 
 EXPOSE 8081 8082
 
-CMD ["/otero"]
+CMD ["./otero"]
