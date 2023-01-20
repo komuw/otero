@@ -11,14 +11,88 @@ services:
     networks:
       - teronet
 
+  # ********************
+  # Telemetry Components
+  # ********************
+  # Jaeger
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    command:
+      - "--memory.max-traces"
+      - "10000"
+      - "--query.base-path"
+      - "/jaeger/ui"
+      - "--prometheus.server-url"
+      - "http://prometheus:"
+    ports:
+      # Agent zipkin.thrift compact
+      - "5775:5775"
+      # Agent jaeger.thrift compact
+      - "6831:6831"
+      # Agent jaeger.thrift binary
+      - "6832:6832"
+      # Agent config HTTP
+      - "5778:5778"
+      # Collector HTTP
+      - "14268:14268"
+      # Collector gRPC
+      - "14250:14250"
+      # Web HTTP
+      - "16686:16686"
+      # Agent zipkin.thrift compact
+      - "5775:5775"
+      # Agent jaeger.thrift compact
+      - "6831:6831"
+      # Agent jaeger.thrift binary
+      - "6832:6832"
+      # Agent config HTTP
+      - "5778:5778"
+      # Collector HTTP
+      - "14268:14268"
+      # Collector gRPC
+      - "14250:14250"
+      # Web HTTP
+      - "16686:16686"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - METRICS_STORAGE_TYPE=prometheus
+    networks:
+      - teronet
+
+  # OpenTelemetry Collector
+  otel_collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    command: --config=/etc/otelcol-config.yml
+    volumes:
+      - ./confs/otel-collector-config.yml:/etc/otelcol-config.yml
+    ports:
+      - "4317:4317" # OTLP over gRPC receiver
+      - "4318:4318" # OTLP over HTTP receiver
+      - "9464:9464" # Prometheus exporter
+      - "8888:8888" # metrics endpoint
+    depends_on:
+      - jaeger
+    networks:
+      - teronet
+
+  # Prometheus
+  prometheus:
+    image: quay.io/prometheus/prometheus:latest
+    # command:
+    #   - --web.console.templates=/etc/prometheus/consoles
+    #   - --web.console.libraries=/etc/prometheus/console_libraries
+    #   - --storage.tsdb.retention.time=1h
+    #   - --config.file=/etc/prometheus/prometheus-config.yaml
+    #   - --storage.tsdb.path=/prometheus
+    #   - --web.enable-lifecycle
+    #   - --web.route-prefix=/
+    volumes:
+      - ./confs/prometheus-config.yaml:/etc/prometheus/prometheus-config.yaml
+    ports:
+      - "9090:9090"
+    networks:
+      - teronet
+
 # We create a docker network and so that otero is able to access the other containers.
 networks:
   teronet: null
-
-#
-#
-#
-#
-# some miscellaneous notes:
-#
-# apt -y update;apt -y install procps psmisc telnet iputils-ping nano curl wget
