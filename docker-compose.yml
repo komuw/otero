@@ -1,0 +1,24 @@
+version: '3.3'
+services:
+
+  otero:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+      - "8082:8082"
+    networks:
+      - teronet
+
+# We create a docker network and so that otero is able to access the other containers.
+networks:
+  teronet: null
+
+#
+#
+#
+#
+# some miscellaneous notes:
+#
+# apt -y update;apt -y install procps psmisc telnet iputils-ping nano curl wget
