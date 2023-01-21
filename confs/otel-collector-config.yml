@@ -1,32 +1,95 @@
+# otel collector config.
+#
+# https://opentelemetry.io/docs/collector/configuration/
+
+# The Collector consists of three components that access telemetry data:
+# (a) Receivers
+# (b) Processors
+# (c) Exporters
+# (d) Extensions(optional)
+# These components once configured must be enabled via pipelines within the service section.
+
+# (a) Receivers
+# A receiver, which can be push or pull based, is how data gets into the Collector
+# https://github.com/open-telemetry/opentelemetry-collector/blob/main/receiver/README.md
+
 receivers:
-  jaeger:
-    protocols:
-      thrift_http:
-        endpoint: "0.0.0.0:14278"
-  # Dummy receiver that's never used, because a pipeline is required to have one.
-  otlp/spanmetrics:
+
+  # Data sources: traces, metrics, logs
+  otlp:
     protocols:
       grpc:
-        endpoint: "localhost:65535"
-exporters:
-  prometheus:
-    endpoint: "0.0.0.0:8889"
-  jaeger:
-    endpoint: "jaeger:14250" # using the docker-compose name of the jaeger container
-    tls:
-      insecure: true
+      http:
+
+# (b) Processors
+# Processors are run on data between being received and being exported. Processors are optional though some are recommended.
+# https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/README.md
+
 processors:
-  batch:
-  spanmetrics:
-    metrics_exporter: prometheus
+
+  # Data sources: traces, metrics, logs
+  memory_limiter:
+    check_interval: 10s
+    limit_percentage: 50
+    spike_limit_percentage: 30
+
+  # Data sources: traces, metrics, logs
+  batch: # batching helps better compress the data and reduce the number of outgoing connections
+    send_batch_size: 8192
+
+# (c) Exporters
+# An exporter, which can be push or pull based, is how you send data to one or more destinations.
+
+exporters:
+
+  # Data sources: traces, metrics, logs
+  file:
+    path: ./otel_exported.json
+
+  # Data sources: traces, metrics, logs
+  # logging:
+  #   loglevel: debug
+
+  # Data sources: traces, metrics, logs
+  otlp:
+    endpoint: otel_collector:4317
+
+  # Data sources: traces, metrics
+  otlphttp:
+    endpoint: https://otel_collector:4318/v1/traces
+
+# (d) Extensions
+# Extensions are available primarily for tasks that do not involve processing telemetry data
+# They are optional
+
+extensions:
+  zpages: # Enables an HTTP endpoint with data for debugging different components that were properly instrumented for such.
+
+# (e) Service
+# The service section is used to configure what components are enabled in the Collector based on the configuration found in the receivers, processors, exporters, and extensions sections.
+# If a component is configured, but not defined within the service section then it is not enabled. 
+#  The service section consists of three sub-sections:
+# - extensions
+# - pipelines
+# - telemetry
+
 service:
+  extensions: [zpages]
+  # A pipeline consists of a set of receivers, processors and exporters.
+  # pipeline can be of the following types: traces, metrics, logs
   pipelines:
     traces:
-      receivers: [jaeger]
-      processors: [spanmetrics, batch]
-      exporters: [jaeger]
-    # The exporter name in this pipeline must match the spanmetrics.metrics_exporter name.
-    # The receiver is just a dummy and never used; added to pass validation requiring at least one receiver in a pipeline.
-    metrics/spanmetrics:
-      receivers: [otlp/spanmetrics]
-      exporters: [prometheus]
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [file, otlp, otlphttp]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [file, otlp, otlphttp]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [file, otlp]
+  # telemetry: # Telemetry is where the telemetry for the collector itself can be configured.
+
+
