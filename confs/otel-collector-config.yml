@@ -91,5 +91,3 @@ service:
       processors: [memory_limiter, batch]
       exporters: [file, otlp]
   # telemetry: # Telemetry is where the telemetry for the collector itself can be configured.
-
-
