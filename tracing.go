@@ -44,7 +44,7 @@ func setupTracing() (*sdktrace.TracerProvider, error) {
 	// labels/tags that are common to all traces.
 	resource := resource.NewWithAttributes(
 		semconv.SchemaURL,
-		semconv.ServiceNameKey.String("stdout-example"),
+		semconv.ServiceNameKey.String("otero-example"),
 		semconv.ServiceVersionKey.String("0.0.1"),
 		semconv.DeploymentEnvironmentKey.String("staging"),
 		attribute.String("name", "komu"),

@@ -1,10 +1,11 @@
 package main
 
 import (
+	"context"
 	"time"
 
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
+	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/global"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
@@ -33,13 +34,29 @@ func setupMetrics() (*sdkmetric.MeterProvider, error) {
 	// labels/tags that aew common to all metrics.
 	resource := resource.NewWithAttributes(
 		semconv.SchemaURL,
-		semconv.ServiceNameKey.String("stdout-example"),
+		semconv.ServiceNameKey.String("otero-example"),
 		semconv.ServiceVersionKey.String("0.0.1"),
 		semconv.DeploymentEnvironmentKey.String("staging"),
 		attribute.String("name", "komu"),
 	)
 
-	exporter, err := stdoutmetric.New()
+	/*
+		Alternative ways of providing an exporter:
+
+		(a)
+		import "go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
+		exporter, err := stdoutmetric.New()
+
+		(b)
+		import "go.opentelemetry.io/otel/exporters/prometheus"
+		exporter, err := prometheus.New()
+	*/
+
+	exporter, err := otlpmetricgrpc.New(
+		context.Background(),
+		otlpmetricgrpc.WithEndpoint("otel_collector:4317"),
+		otlpmetricgrpc.WithInsecure(),
+	)
 	if err != nil {
 		return nil, err
 	}

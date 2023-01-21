@@ -68,8 +68,8 @@ exporters:
 
   # Data sources: metrics
   prometheus: # configure OpenTelemetry Collector to export data to Prometheus
-    endpoint: "prometheus:9090"
-    # namespace: "default"
+    endpoint: "otel_collector:9464"
+
 
 # (d) Extensions
 # Extensions are available primarily for tasks that do not involve processing telemetry data

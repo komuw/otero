@@ -17,4 +17,8 @@ Notice that, not only do logs have traceId and spanID
     "timestamp":"2023-01-21T16:34:05.104073453Z"}
 ```
 But also the traces have logs;
-![traces integrated with logs](traces.png)
+![traces integrated with logs](traces.png)           
+
+Access prometheus to check on metrics:         
+(http://127.0.0.1:9090/graph)[http://127.0.0.1:9090/graph]         
+![metrics](metrics.png)

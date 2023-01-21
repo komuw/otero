@@ -42,12 +42,31 @@ services:
     networks:
       - teronet
 
+  # Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --storage.tsdb.retention.time=1h
+      - --config.file=/etc/prometheus/prometheus-config.yaml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+      - --web.route-prefix=/
+    volumes:
+      - ./confs/prometheus-config.yaml:/etc/prometheus/prometheus-config.yaml
+    ports:
+      - "9090:9090"
+    networks:
+      - teronet
+
   # OpenTelemetry Collector
   otel_collector:
     image: otel/opentelemetry-collector-contrib:latest
-    command: --config=/etc/otel-collector-config.yml
+    command: --config=/etc/otel-collector-config.yaml
     volumes:
-      - ./confs/otel-collector-config.yml:/etc/otel-collector-config.yml
+      - ./confs/otel-collector-config.yaml:/etc/otel-collector-config.yaml
     ports:
       - "4317:4317" # OTLP over gRPC receiver
       - "4318:4318" # OTLP over HTTP receiver
@@ -55,6 +74,7 @@ services:
       - "8888:8888" # metrics endpoint
     depends_on:
       - jaeger
+      - prometheus
     networks:
       - teronet
 
