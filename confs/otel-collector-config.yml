@@ -56,7 +56,7 @@ exporters:
 
   # Data sources: traces, metrics
   otlphttp:
-    endpoint: https://otel_collector:4318/v1/traces
+    endpoint: http://otel_collector:4318/v1/traces
 
 # (d) Extensions
 # Extensions are available primarily for tasks that do not involve processing telemetry data
