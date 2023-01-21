@@ -43,8 +43,8 @@ processors:
 exporters:
 
   # Data sources: traces, metrics, logs
-  file:
-    path: ./otel_exported.json
+  # file:
+  #   path: ./otel_exported.json
 
   # Data sources: traces, metrics, logs
   # logging:
@@ -87,13 +87,13 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [file, otlp, otlphttp, jaeger]
+      exporters: [ otlp, otlphttp, jaeger]
     metrics:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [file, otlp, otlphttp, jaeger]
+      exporters: [ otlp, otlphttp]
     logs:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [file, otlp]
+      exporters: [ otlp]
   # telemetry: # Telemetry is where the telemetry for the collector itself can be configured.

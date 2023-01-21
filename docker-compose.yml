@@ -22,8 +22,6 @@ services:
       - "10000"
       - "--query.base-path"
       - "/jaeger/ui"
-      - "--prometheus.server-url"
-      - "http://prometheus:"
     ports:
       # Agent zipkin.thrift compact
       - "5775:5775"
