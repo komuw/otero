@@ -32,6 +32,7 @@ func setupTracing() (*sdktrace.TracerProvider, error) {
 		exporter, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
 	*/
 
+	// TODO: replace with https://pkg.go.dev/go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc
 	exporter, err := jaeger.New(
 		jaeger.WithCollectorEndpoint(
 			jaeger.WithEndpoint("http://jaeger:14268/api/traces")),
