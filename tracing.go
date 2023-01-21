@@ -5,7 +5,7 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
+	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -13,37 +13,33 @@ import (
 )
 
 func setupTracing() (*sdktrace.TracerProvider, error) {
-	// There are numerous exporters to choose from.
-	// see: https://github.com/open-telemetry/opentelemetry-go/tree/v1.2.0/exporters
 	/*
-		        Another exporter example, taken from: https://github.com/aspecto-io/opentelemetry-examples/blob/d522230db13780dfd0352ccb7ac63cf021d62108/go/tracing/jaeger.go#L11-L15
+		Alternative ways of providing an exporter:
+		see: https://github.com/open-telemetry/opentelemetry-go/tree/v1.2.0/exporters
 
-		        import "go.opentelemetry.io/otel/exporters/jaeger"
-		        exporter, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint("http://localhost:14268/api/traces")))
-			if err != nil {
-				return nil, err
-			}
+		(a)
+		taken from: https://github.com/aspecto-io/opentelemetry-examples/blob/d522230db13780dfd0352ccb7ac63cf021d62108/go/tracing/aspecto.go#L13-L21
+		import "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+		exp, err := otlptracegrpc.New(
+						context.Background(),
+				otlptracegrpc.WithEndpoint("collector.aspecto.io:4317"),
+				otlptracegrpc.WithHeaders(map[string]string{
+				"Authorization": "<ADD YOUR TOKEN HERE>",
+			}))
+
+		(b)
+		import "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
+		exporter, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
 	*/
 
-	/*
-		        Another exporter example, taken from: https://github.com/aspecto-io/opentelemetry-examples/blob/d522230db13780dfd0352ccb7ac63cf021d62108/go/tracing/aspecto.go#L13-L21
-
-		         import "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
-		         exp, err := otlptracegrpc.New(
-		                           context.Background(),
-				           otlptracegrpc.WithEndpoint("collector.aspecto.io:4317"),
-				           otlptracegrpc.WithHeaders(map[string]string{
-					       "Authorization": "<ADD YOUR TOKEN HERE>",
-				       }))
-			if err != nil {
-				return nil, err
-			}
-	*/
-
-	exporter, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
+	exporter, err := jaeger.New(
+		jaeger.WithCollectorEndpoint(
+			jaeger.WithEndpoint("http://jaeger:14268/api/traces")),
+	)
 	if err != nil {
 		return nil, err
 	}
+
 	// labels/tags that are common to all traces.
 	resource := resource.NewWithAttributes(
 		semconv.SchemaURL,
