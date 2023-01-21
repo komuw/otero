@@ -58,6 +58,12 @@ exporters:
   otlphttp:
     endpoint: http://otel_collector:4318/v1/traces
 
+  # Data sources: traces, metrics
+  jaeger:
+    endpoint: jaeger:14250
+    tls:
+      insecure: true
+
 # (d) Extensions
 # Extensions are available primarily for tasks that do not involve processing telemetry data
 # They are optional
@@ -81,11 +87,11 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [file, otlp, otlphttp]
+      exporters: [file, otlp, otlphttp, jaeger]
     metrics:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [file, otlp, otlphttp]
+      exporters: [file, otlp, otlphttp, jaeger]
     logs:
       receivers: [otlp]
       processors: [memory_limiter, batch]
