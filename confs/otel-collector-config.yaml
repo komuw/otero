@@ -8,6 +8,8 @@
 # (c) Exporters
 # (d) Extensions(optional)
 # These components once configured must be enabled via pipelines within the service section.
+#
+# Receivers -> Processors -> Exporters
 
 # (a) Receivers
 # A receiver, which can be push or pull based, is how data gets into the Collector
@@ -64,6 +66,11 @@ exporters:
     tls:
       insecure: true
 
+  # Data sources: metrics
+  prometheus: # configure OpenTelemetry Collector to export data to Prometheus
+    endpoint: "prometheus:9090"
+    # namespace: "default"
+
 # (d) Extensions
 # Extensions are available primarily for tasks that do not involve processing telemetry data
 # They are optional
@@ -91,7 +98,7 @@ service:
     metrics:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [ otlp, otlphttp]
+      exporters: [ otlp, otlphttp, prometheus]
     logs:
       receivers: [otlp]
       processors: [memory_limiter, batch]
