@@ -48,9 +48,9 @@ services:
   # OpenTelemetry Collector
   otel_collector:
     image: otel/opentelemetry-collector-contrib:latest
-    command: --config=/etc/otelcol-config.yml
+    command: --config=/etc/otel-collector-config.yml
     volumes:
-      - ./confs/otel-collector-config.yml:/etc/otelcol-config.yml
+      - ./confs/otel-collector-config.yml:/etc/otel-collector-config.yml
     ports:
       - "4317:4317" # OTLP over gRPC receiver
       - "4318:4318" # OTLP over HTTP receiver
