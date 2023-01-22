@@ -28,11 +28,9 @@ func getMeter() metric.Meter {
 	)
 }
 
-// TODO: pass in context
-//
 // For how to use prometheus instead of stdout
 // see: https://github.com/banked/GopherConUK2021/blob/0d737737dfad3c5fda08f7b730587265a36bf747/demo5/main.go#L33-L65
-func setupMetrics() (*sdkmetric.MeterProvider, error) {
+func setupMetrics(ctx context.Context) (*sdkmetric.MeterProvider, error) {
 	// labels/tags that aew common to all metrics.
 	resource := resource.NewWithAttributes(
 		semconv.SchemaURL,
@@ -55,7 +53,7 @@ func setupMetrics() (*sdkmetric.MeterProvider, error) {
 	*/
 
 	exporter, err := otlpmetricgrpc.New(
-		context.Background(),
+		ctx,
 		otlpmetricgrpc.WithEndpoint("otel_collector:4317"),
 		otlpmetricgrpc.WithInsecure(),
 	)

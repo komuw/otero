@@ -43,7 +43,7 @@ processors:
 # An exporter, which can be push or pull based, is how you send data to one or more destinations.
 
 exporters:
-
+  # TODO: add file exporter.
   # Data sources: traces, metrics, logs
   # file:
   #   path: ./otel_exported.json
@@ -55,10 +55,6 @@ exporters:
   # Data sources: traces, metrics, logs
   otlp:
     endpoint: otel_collector:4317
-
-  # Data sources: traces, metrics
-  otlphttp:
-    endpoint: http://otel_collector:4318/v1/traces
 
   # Data sources: traces, metrics
   jaeger:
@@ -94,11 +90,11 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [ otlp, otlphttp, jaeger]
+      exporters: [ otlp, jaeger]
     metrics:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [ otlp, otlphttp, prometheus]
+      exporters: [ otlp, prometheus]
     logs:
       receivers: [otlp]
       processors: [memory_limiter, batch]

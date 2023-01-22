@@ -13,8 +13,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 )
 
-// TODO: pass in context
-func setupTracing() (*sdktrace.TracerProvider, error) {
+func setupTracing(ctx context.Context) (*sdktrace.TracerProvider, error) {
 	/*
 		Alternative ways of providing an exporter:
 		see: https://github.com/open-telemetry/opentelemetry-go/tree/v1.2.0/exporters
@@ -32,7 +31,7 @@ func setupTracing() (*sdktrace.TracerProvider, error) {
 	*/
 
 	exporter, err := otlptracegrpc.New(
-		context.Background(),
+		ctx,
 		otlptracegrpc.WithEndpoint("otel_collector:4317"),
 		otlptracegrpc.WithInsecure(),
 	)
@@ -107,8 +106,6 @@ func (c loggingSpanProcessor) OnEnd(s sdktrace.ReadOnlySpan) {
 	// )
 }
 
-func (c loggingSpanProcessor) OnStart(parent context.Context, s sdktrace.ReadWriteSpan) {
-	// TODO: also maybe log at the start??
-}
-func (c loggingSpanProcessor) ForceFlush(ctx context.Context) error { return nil }
-func (c loggingSpanProcessor) Shutdown(ctx context.Context) error   { return nil }
+func (c loggingSpanProcessor) OnStart(parent context.Context, s sdktrace.ReadWriteSpan) {}
+func (c loggingSpanProcessor) ForceFlush(ctx context.Context) error                     { return nil }
+func (c loggingSpanProcessor) Shutdown(ctx context.Context) error                       { return nil }
