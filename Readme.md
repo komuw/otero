@@ -1,12 +1,12 @@
-`otero` is a sample app that has logs, traces and metrics integrated together.
+`otero` is a sample app that has logs, traces and metrics integrated together.                  
 
-start;       
-`docker-compose up --build`       
-Make some requests;       
-`curl -vkL http://127.0.0.1:8081/serviceA`       
-Access jaeger to check on traces:       
-(http://127.0.0.1:16686/jaeger)[http://127.0.0.1:16686/jaeger]       
-Notice that, not only do logs have traceId and spanID            
+start;            
+`docker-compose up --build`                
+Make some requests;             
+`curl -vkL http://127.0.0.1:8081/serviceA`                
+Access jaeger to check on traces:              
+(localhost:16686/jaeger)[http://127.0.0.1:16686/jaeger]             
+Notice that, not only do logs have traceId and spanID                
 ```sh
 {
     "app":"my_demo_app",
@@ -16,9 +16,9 @@ Notice that, not only do logs have traceId and spanID
     "traceId":"65dfaa69df19a385095e7e31a812091e",
     "timestamp":"2023-01-21T16:34:05.104073453Z"}
 ```
-But also the traces have logs;
-![traces integrated with logs](traces.png)           
+But also the traces have logs;               
+![traces integrated with logs](traces.png)                     
 
-Access prometheus to check on metrics:         
-(http://127.0.0.1:9090/graph)[http://127.0.0.1:9090/graph]         
-![metrics](metrics.png)
+Access prometheus to check on metrics:                  
+(localhost:9090/graph)[http://127.0.0.1:9090/graph]                            
+![metrics](metrics.png)                   
