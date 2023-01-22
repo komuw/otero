@@ -5,49 +5,44 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
+
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 )
 
-func setupTracing() (*sdktrace.TracerProvider, error) {
-	// There are numerous exporters to choose from.
-	// see: https://github.com/open-telemetry/opentelemetry-go/tree/v1.2.0/exporters
+func setupTracing(ctx context.Context) (*sdktrace.TracerProvider, error) {
 	/*
-		        Another exporter example, taken from: https://github.com/aspecto-io/opentelemetry-examples/blob/d522230db13780dfd0352ccb7ac63cf021d62108/go/tracing/jaeger.go#L11-L15
+		Alternative ways of providing an exporter:
+		see: https://github.com/open-telemetry/opentelemetry-go/tree/v1.2.0/exporters
 
-		        import "go.opentelemetry.io/otel/exporters/jaeger"
-		        exporter, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint("http://localhost:14268/api/traces")))
-			if err != nil {
-				return nil, err
-			}
+		(a)
+		import "go.opentelemetry.io/otel/exporters/jaeger"
+		exporter, err := jaeger.New(
+			jaeger.WithCollectorEndpoint(
+				jaeger.WithEndpoint("http://jaeger:14268/api/traces")),
+		)
+
+		(b)
+		import "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
+		exporter, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
 	*/
 
-	/*
-		        Another exporter example, taken from: https://github.com/aspecto-io/opentelemetry-examples/blob/d522230db13780dfd0352ccb7ac63cf021d62108/go/tracing/aspecto.go#L13-L21
-
-		         import "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
-		         exp, err := otlptracegrpc.New(
-		                           context.Background(),
-				           otlptracegrpc.WithEndpoint("collector.aspecto.io:4317"),
-				           otlptracegrpc.WithHeaders(map[string]string{
-					       "Authorization": "<ADD YOUR TOKEN HERE>",
-				       }))
-			if err != nil {
-				return nil, err
-			}
-	*/
-
-	exporter, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
+	exporter, err := otlptracegrpc.New(
+		ctx,
+		otlptracegrpc.WithEndpoint("otel_collector:4317"),
+		otlptracegrpc.WithInsecure(),
+	)
 	if err != nil {
 		return nil, err
 	}
+
 	// labels/tags that are common to all traces.
 	resource := resource.NewWithAttributes(
 		semconv.SchemaURL,
-		semconv.ServiceNameKey.String("stdout-example"),
+		semconv.ServiceNameKey.String("otero-example"),
 		semconv.ServiceVersionKey.String("0.0.1"),
 		semconv.DeploymentEnvironmentKey.String("staging"),
 		attribute.String("name", "komu"),
@@ -111,8 +106,6 @@ func (c loggingSpanProcessor) OnEnd(s sdktrace.ReadOnlySpan) {
 	// )
 }
 
-func (c loggingSpanProcessor) OnStart(parent context.Context, s sdktrace.ReadWriteSpan) {
-	// TODO: also maybe log at the start??
-}
-func (c loggingSpanProcessor) ForceFlush(ctx context.Context) error { return nil }
-func (c loggingSpanProcessor) Shutdown(ctx context.Context) error   { return nil }
+func (c loggingSpanProcessor) OnStart(parent context.Context, s sdktrace.ReadWriteSpan) {}
+func (c loggingSpanProcessor) ForceFlush(ctx context.Context) error                     { return nil }
+func (c loggingSpanProcessor) Shutdown(ctx context.Context) error                       { return nil }

@@ -1,10 +1,10 @@
 FROM golang:1.19
 
 WORKDIR /src
-COPY . .
 
 RUN apt -y update;apt -y install procps psmisc telnet iputils-ping nano curl wget
 
+COPY . .
 RUN go mod download
 RUN go build -o otero ./...
 

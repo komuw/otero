@@ -25,7 +25,7 @@ func serviceA(ctx context.Context, port int, tracerName string) {
 		defer span.End()
 
 		counter, _ := getMeter().SyncInt64().Counter(
-			"serviceA.called.counter",
+			"service_a_called_counter",
 			instrument.WithDescription("how many time the serviceA handler has been called."),
 		)
 		counter.Add(ctx, 1)

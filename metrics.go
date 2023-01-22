@@ -1,10 +1,11 @@
 package main
 
 import (
+	"context"
 	"time"
 
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
+	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/global"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
@@ -29,17 +30,33 @@ func getMeter() metric.Meter {
 
 // For how to use prometheus instead of stdout
 // see: https://github.com/banked/GopherConUK2021/blob/0d737737dfad3c5fda08f7b730587265a36bf747/demo5/main.go#L33-L65
-func setupMetrics() (*sdkmetric.MeterProvider, error) {
+func setupMetrics(ctx context.Context) (*sdkmetric.MeterProvider, error) {
 	// labels/tags that aew common to all metrics.
 	resource := resource.NewWithAttributes(
 		semconv.SchemaURL,
-		semconv.ServiceNameKey.String("stdout-example"),
+		semconv.ServiceNameKey.String("otero-example"),
 		semconv.ServiceVersionKey.String("0.0.1"),
 		semconv.DeploymentEnvironmentKey.String("staging"),
 		attribute.String("name", "komu"),
 	)
 
-	exporter, err := stdoutmetric.New()
+	/*
+		Alternative ways of providing an exporter:
+
+		(a)
+		import "go.opentelemetry.io/otel/exporters/stdout/stdoutmetric"
+		exporter, err := stdoutmetric.New()
+
+		(b)
+		import "go.opentelemetry.io/otel/exporters/prometheus"
+		exporter, err := prometheus.New()
+	*/
+
+	exporter, err := otlpmetricgrpc.New(
+		ctx,
+		otlpmetricgrpc.WithEndpoint("otel_collector:4317"),
+		otlpmetricgrpc.WithInsecure(),
+	)
 	if err != nil {
 		return nil, err
 	}

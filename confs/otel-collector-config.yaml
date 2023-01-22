@@ -8,6 +8,8 @@
 # (c) Exporters
 # (d) Extensions(optional)
 # These components once configured must be enabled via pipelines within the service section.
+#
+# Receivers -> Processors -> Exporters
 
 # (a) Receivers
 # A receiver, which can be push or pull based, is how data gets into the Collector
@@ -41,10 +43,10 @@ processors:
 # An exporter, which can be push or pull based, is how you send data to one or more destinations.
 
 exporters:
-
+  # TODO: add file exporter.
   # Data sources: traces, metrics, logs
-  file:
-    path: ./otel_exported.json
+  # file:
+  #   path: ./otel_exported.json
 
   # Data sources: traces, metrics, logs
   # logging:
@@ -55,8 +57,15 @@ exporters:
     endpoint: otel_collector:4317
 
   # Data sources: traces, metrics
-  otlphttp:
-    endpoint: http://otel_collector:4318/v1/traces
+  jaeger:
+    endpoint: jaeger:14250
+    tls:
+      insecure: true
+
+  # Data sources: metrics
+  prometheus: # configure OpenTelemetry Collector to export data to Prometheus
+    endpoint: "otel_collector:9464"
+
 
 # (d) Extensions
 # Extensions are available primarily for tasks that do not involve processing telemetry data
@@ -81,13 +90,13 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [file, otlp, otlphttp]
+      exporters: [ otlp, jaeger]
     metrics:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [file, otlp, otlphttp]
+      exporters: [ otlp, prometheus]
     logs:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [file, otlp]
+      exporters: [ otlp]
   # telemetry: # Telemetry is where the telemetry for the collector itself can be configured.

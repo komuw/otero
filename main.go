@@ -4,13 +4,12 @@ import (
 	"context"
 )
 
-// TODO: rename
 const tracerName = "github.com/komuw/otero"
 
 func main() {
 	ctx := context.Background()
 	{
-		tp, err := setupTracing()
+		tp, err := setupTracing(ctx)
 		if err != nil {
 			panic(err)
 		}
@@ -19,7 +18,7 @@ func main() {
 			_ = err
 		}()
 
-		mp, err := setupMetrics()
+		mp, err := setupMetrics(ctx)
 		if err != nil {
 			panic(err)
 		}
