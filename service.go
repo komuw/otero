@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net"
 	"net/http"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -37,9 +36,9 @@ func serviceA(ctx context.Context, port int, tracerName string) {
 		cli := &http.Client{
 			Transport: otelhttp.NewTransport(
 				http.DefaultTransport,
-				// if you use the alternative way of setting global propagator as shown in `tracing.go`
-				// then you do not need to provide this one
-				// otelhttp.WithPropagators(propagator),
+			// If you did not set the global propagator as shown in `tracing.go`
+			// then you need to provide this one
+			// otelhttp.WithPropagators(propagator),
 			),
 		}
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://127.0.0.1:8082/serviceB", nil)
@@ -63,16 +62,13 @@ func serviceA(ctx context.Context, port int, tracerName string) {
 	handler := otelhttp.NewHandler(
 		&mux,
 		"server.http",
-		// if you use the alternative way of setting global propagator as shown in `tracing.go`
-		// then you do not need to provide this one
+		// If you did not set the global propagator as shown in `tracing.go`
+		// then you need to provide this one
 		// otelhttp.WithPropagators(propagator),
 	)
 	server := &http.Server{
 		Addr:    serverPort,
 		Handler: handler,
-		// It is very important to add this `BaseContext``
-		// so that it gets the one from OpenTelemetry
-		BaseContext: func(net.Listener) context.Context { return ctx },
 	}
 
 	log := New(ctx)
@@ -92,6 +88,12 @@ func serviceB(ctx context.Context, port int, tracerName string) {
 		ctx, span := otel.Tracer(tracerName).Start(r.Context(), "serviceB_HttpHandler")
 		defer span.End()
 
+		counter, _ := getMeter().SyncInt64().Counter(
+			"serviceB_call_counter",
+			instrument.WithDescription("how many time the serviceB handler has been called."),
+		)
+		counter.Add(ctx, 1)
+
 		log := New(ctx)
 		log.Info("serviceB called")
 
@@ -107,16 +109,13 @@ func serviceB(ctx context.Context, port int, tracerName string) {
 	handler := otelhttp.NewHandler(
 		&mux,
 		"server.http",
-		// if you use the alternative way of setting global propagator as shown in `tracing.go`
-		// then you do not need to provide this one
+		// If you did not set the global propagator as shown in `tracing.go`
+		// then you need to provide this one
 		// otelhttp.WithPropagators(propagator),
 	)
 	server := &http.Server{
 		Addr:    serverPort,
 		Handler: handler,
-		// It is very important to add this `BaseContext``
-		// so that it gets the one from OpenTelemetry
-		BaseContext: func(net.Listener) context.Context { return ctx },
 	}
 
 	log := New(ctx)

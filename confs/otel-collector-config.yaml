@@ -21,7 +21,7 @@ receivers:
   otlp:
     protocols:
       grpc:
-      http:
+      # http:
 
 # (b) Processors
 # Processors are run on data between being received and being exported. Processors are optional though some are recommended.
@@ -56,6 +56,8 @@ exporters:
   # Data sources: traces, metrics, logs
   otlp:
     endpoint: otel_collector:4317
+    # headers:
+    #   header1: "header-value1"
 
   # Data sources: traces, metrics
   jaeger:
