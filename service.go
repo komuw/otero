@@ -81,7 +81,8 @@ func serviceA_HttpHandler(w http.ResponseWriter, r *http.Request) {
 	log := New(ctx)
 	log.Info("serviceA_HttpHandler called")
 
-	// When serviceA is called, it calls serviceB
+	// When serviceA is called, it calls serviceB over tcp network.
+	// We should still be able to propagate traces over a tcp network.
 	cli := &http.Client{
 		Transport: otelhttp.NewTransport(
 			http.DefaultTransport,
@@ -90,8 +91,7 @@ func serviceA_HttpHandler(w http.ResponseWriter, r *http.Request) {
 		// otelhttp.WithPropagators(propagator),
 		),
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://127.0.0.1:8082/serviceB", nil)
-	// req, err := http.NewRequest(http.MethodGet, "http://127.0.0.1:8082/serviceB", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://otero_service_b:8082/serviceB", nil)
 	if err != nil {
 		panic(err)
 	}

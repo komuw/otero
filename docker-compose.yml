@@ -1,7 +1,7 @@
 version: '3.3'
 services:
 
-  otero:
+  otero_service_a:
     build:
       context: .
       dockerfile: Dockerfile
@@ -10,11 +10,29 @@ services:
       - "run"
       - "-race"
       - "./..."
+      - "-service"
+      - "A"
     volumes:
       - ./:/src
     ports:
       - "8081:8081"
       - "8082:8082"
+    networks:
+      - teronet
+
+  otero_service_b:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command:
+      - "go"
+      - "run"
+      - "-race"
+      - "./..."
+      - "-service"
+      - "B"
+    volumes:
+      - ./:/src
     networks:
       - teronet
 
