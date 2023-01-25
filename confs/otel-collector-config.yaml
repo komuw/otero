@@ -37,7 +37,8 @@ processors:
 
   # Data sources: traces, metrics, logs
   batch: # batching helps better compress the data and reduce the number of outgoing connections
-    send_batch_size: 8192
+    send_batch_size: 8192 # Number of spans, metric data points, or log records after which a batch will be sent regardless of the timeout.
+    timeout: 10s # Time duration after which a batch will be sent regardless of size.
 
 # (c) Exporters
 # An exporter, which can be push or pull based, is how you send data to one or more destinations.
