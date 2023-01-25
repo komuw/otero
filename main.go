@@ -28,6 +28,6 @@ func main() {
 		}()
 	}
 
-	go func() { serviceA(ctx, 8081, tracerName) }()
-	serviceB(ctx, 8082, tracerName)
+	go func() { serviceA(ctx, 8081) }()
+	serviceB(ctx, 8082)
 }

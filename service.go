@@ -14,50 +14,12 @@ import (
 )
 
 // curl -vkL http://127.0.0.1:8081/serviceA
-func serviceA(ctx context.Context, port int, tracerName string) {
+func serviceA(ctx context.Context, port int) {
 	serverPort := fmt.Sprintf(":%d", port)
 	address := fmt.Sprintf("127.0.0.1%s", serverPort)
 	var mux http.ServeMux
 
-	mux.HandleFunc("/serviceA", func(w http.ResponseWriter, r *http.Request) {
-		ctx, span := otel.Tracer(tracerName).Start(r.Context(), "serviceA_HttpHandler")
-		defer span.End()
-
-		counter, _ := getMeter().SyncInt64().Counter(
-			"service_a_called_counter",
-			instrument.WithDescription("how many time the serviceA handler has been called."),
-		)
-		counter.Add(ctx, 1)
-
-		log := New(ctx)
-		log.Info("serviceA called")
-
-		// When serviceA is called, it calls serviceB
-		cli := &http.Client{
-			Transport: otelhttp.NewTransport(
-				http.DefaultTransport,
-			// If you did not set the global propagator as shown in `tracing.go`
-			// then you need to provide this one
-			// otelhttp.WithPropagators(propagator),
-			),
-		}
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://127.0.0.1:8082/serviceB", nil)
-		// req, err := http.NewRequest(http.MethodGet, "http://127.0.0.1:8082/serviceB", nil)
-		if err != nil {
-			panic(err)
-		}
-		resp, err := cli.Do(req)
-		if err != nil {
-			panic(err)
-		}
-		log.Info("serviceA called serviceB and got resp.StatusCode: ", resp.StatusCode)
-
-		fmt.Fprintf(w, "hello from serviceA")
-		// response header contains, `Ot-Tracer-Spanid` & `Ot-Tracer-Traceid` headers that are added by the otel propagator.
-		// upstream services can then consume those.
-		log.Info("request.Header serviceA: ", r.Header)
-		log.Info("response.Header serviceA: ", w.Header())
-	})
+	mux.HandleFunc("/serviceA", serviceA_HttpHandler)
 
 	handler := otelhttp.NewHandler(
 		&mux,
@@ -80,31 +42,11 @@ func serviceA(ctx context.Context, port int, tracerName string) {
 }
 
 // curl -vkL http://127.0.0.1:8082/serviceB
-func serviceB(ctx context.Context, port int, tracerName string) {
+func serviceB(ctx context.Context, port int) {
 	serverPort := fmt.Sprintf(":%d", port)
 	address := fmt.Sprintf("127.0.0.1%s", serverPort)
 	var mux http.ServeMux
-	mux.HandleFunc("/serviceB", func(w http.ResponseWriter, r *http.Request) {
-		ctx, span := otel.Tracer(tracerName).Start(r.Context(), "serviceB_HttpHandler")
-		defer span.End()
-
-		counter, _ := getMeter().SyncInt64().Counter(
-			"serviceB_call_counter",
-			instrument.WithDescription("how many time the serviceB handler has been called."),
-		)
-		counter.Add(ctx, 1)
-
-		log := New(ctx)
-		log.Info("serviceB called")
-
-		answer := add(ctx, 42, 1813)
-
-		fmt.Fprintf(w, "hello from serviceB: Answer is: %d", answer)
-		// response header contains, `Ot-Tracer-Spanid` & `Ot-Tracer-Traceid` headers that are added by the otel propagator.
-		// upstream services can then consume those.
-		log.Info("request.Header serviceB: ", r.Header)
-		log.Info("response.Header serviceB: ", w.Header())
-	})
+	mux.HandleFunc("/serviceB", serviceB_HttpHandler)
 
 	handler := otelhttp.NewHandler(
 		&mux,
@@ -124,6 +66,68 @@ func serviceB(ctx context.Context, port int, tracerName string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func serviceA_HttpHandler(w http.ResponseWriter, r *http.Request) {
+	ctx, span := otel.Tracer(tracerName).Start(r.Context(), "serviceA_HttpHandler")
+	defer span.End()
+
+	counter, _ := getMeter().SyncInt64().Counter(
+		"service_a_called_counter",
+		instrument.WithDescription("how many time the serviceA handler has been called."),
+	)
+	counter.Add(ctx, 1)
+
+	log := New(ctx)
+	log.Info("serviceA_HttpHandler called")
+
+	// When serviceA is called, it calls serviceB
+	cli := &http.Client{
+		Transport: otelhttp.NewTransport(
+			http.DefaultTransport,
+		// If you did not set the global propagator as shown in `tracing.go`
+		// then you need to provide this one
+		// otelhttp.WithPropagators(propagator),
+		),
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://127.0.0.1:8082/serviceB", nil)
+	// req, err := http.NewRequest(http.MethodGet, "http://127.0.0.1:8082/serviceB", nil)
+	if err != nil {
+		panic(err)
+	}
+	resp, err := cli.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	log.Info("serviceA called serviceB and got resp.StatusCode: ", resp.StatusCode)
+
+	fmt.Fprintf(w, "hello from serviceA")
+	// response header contains, `Ot-Tracer-Spanid` & `Ot-Tracer-Traceid` headers that are added by the otel propagator.
+	// upstream services can then consume those.
+	log.Info("request.Header serviceA: ", r.Header)
+	log.Info("response.Header serviceA: ", w.Header())
+}
+
+func serviceB_HttpHandler(w http.ResponseWriter, r *http.Request) {
+	ctx, span := otel.Tracer(tracerName).Start(r.Context(), "serviceB_HttpHandler")
+	defer span.End()
+
+	counter, _ := getMeter().SyncInt64().Counter(
+		"serviceB_call_counter",
+		instrument.WithDescription("how many time the serviceB handler has been called."),
+	)
+	counter.Add(ctx, 1)
+
+	log := New(ctx)
+	log.Info("serviceB_HttpHandler called")
+
+	answer := add(ctx, 42, 1813)
+
+	fmt.Fprintf(w, "hello from serviceB: Answer is: %d", answer)
+	// response header contains, `Ot-Tracer-Spanid` & `Ot-Tracer-Traceid` headers that are added by the otel propagator.
+	// upstream services can then consume those.
+	log.Info("request.Header serviceB: ", r.Header)
+	log.Info("response.Header serviceB: ", w.Header())
 }
 
 func add(ctx context.Context, x, y int64) int64 {
