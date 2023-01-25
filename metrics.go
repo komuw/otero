@@ -30,11 +30,11 @@ func getMeter() metric.Meter {
 
 // For how to use prometheus instead of stdout
 // see: https://github.com/banked/GopherConUK2021/blob/0d737737dfad3c5fda08f7b730587265a36bf747/demo5/main.go#L33-L65
-func setupMetrics(ctx context.Context) (*sdkmetric.MeterProvider, error) {
+func setupMetrics(ctx context.Context, serviceName string) (*sdkmetric.MeterProvider, error) {
 	// labels/tags that aew common to all metrics.
 	resource := resource.NewWithAttributes(
 		semconv.SchemaURL,
-		semconv.ServiceNameKey.String("otero-example"),
+		semconv.ServiceNameKey.String(serviceName),
 		semconv.ServiceVersionKey.String("0.0.1"),
 		semconv.DeploymentEnvironmentKey.String("staging"),
 		attribute.String("name", "komu"),

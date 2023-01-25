@@ -13,7 +13,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 )
 
-func setupTracing(ctx context.Context) (*sdktrace.TracerProvider, error) {
+func setupTracing(ctx context.Context, serviceName string) (*sdktrace.TracerProvider, error) {
 	/*
 		Alternative ways of providing an exporter:
 		see: https://github.com/open-telemetry/opentelemetry-go/tree/v1.2.0/exporters
@@ -42,7 +42,7 @@ func setupTracing(ctx context.Context) (*sdktrace.TracerProvider, error) {
 	// labels/tags that are common to all traces.
 	resource := resource.NewWithAttributes(
 		semconv.SchemaURL,
-		semconv.ServiceNameKey.String("otero-example"),
+		semconv.ServiceNameKey.String(serviceName),
 		semconv.ServiceVersionKey.String("0.0.1"),
 		semconv.DeploymentEnvironmentKey.String("staging"),
 		attribute.String("name", "komu"),

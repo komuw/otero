@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"strings"
 )
 
@@ -23,8 +24,9 @@ func main() {
 	}
 
 	ctx := context.Background()
+	serviceName := fmt.Sprintf("otero-svc-%s", strings.ToUpper(service))
 	{
-		tp, err := setupTracing(ctx)
+		tp, err := setupTracing(ctx, serviceName)
 		if err != nil {
 			panic(err)
 		}
@@ -33,7 +35,7 @@ func main() {
 			_ = err
 		}()
 
-		mp, err := setupMetrics(ctx)
+		mp, err := setupMetrics(ctx, serviceName)
 		if err != nil {
 			panic(err)
 		}
