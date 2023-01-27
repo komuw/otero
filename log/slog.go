@@ -47,6 +47,7 @@ func (s otelHandler) Enabled(_ slog.Level) bool { return true /* support all log
 func (s otelHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &otelHandler{h: s.h.WithAttrs(attrs)}
 }
+
 func (s otelHandler) WithGroup(name string) slog.Handler {
 	return &otelHandler{h: s.h.WithGroup(name)}
 }
@@ -69,10 +70,14 @@ func (s otelHandler) Handle(r slog.Record) (err error) {
 		sCtx := span.SpanContext()
 		attrs := make([]slog.Attr, 0)
 		if sCtx.HasTraceID() {
-			attrs = append(attrs, slog.Attr{Key: "traceId", Value: slog.StringValue(sCtx.TraceID().String())})
+			attrs = append(attrs,
+				slog.Attr{Key: "traceId", Value: slog.StringValue(sCtx.TraceID().String())},
+			)
 		}
 		if sCtx.HasSpanID() {
-			attrs = append(attrs, slog.Attr{Key: "spanId", Value: slog.StringValue(sCtx.SpanID().String())})
+			attrs = append(attrs,
+				slog.Attr{Key: "spanId", Value: slog.StringValue(sCtx.SpanID().String())},
+			)
 		}
 		if len(attrs) > 0 {
 			r.AddAttrs(attrs...)
@@ -91,6 +96,20 @@ func (s otelHandler) Handle(r slog.Record) (err error) {
 		attrs = append(attrs, logSeverityKey.String(r.Level.String()))
 		attrs = append(attrs, logMessageKey.String(r.Message))
 
+		// TODO: Obey the following rules form the slog documentation:
+		//
+		// Handle methods that produce output should observe the following rules:
+		//   - If r.Time is the zero time, ignore the time.
+		//   - If an Attr's key is the empty string, ignore the Attr.
+		//
+		r.Attrs(func(a slog.Attr) {
+			attrs = append(attrs,
+				attribute.KeyValue{
+					Key:   attribute.Key(a.Key),
+					Value: attribute.StringValue(a.Value.String()),
+				},
+			)
+		})
 		// todo: add caller info.
 
 		span.AddEvent("log", trace.WithAttributes(attrs...))
