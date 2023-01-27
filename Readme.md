@@ -5,7 +5,7 @@ start;
 Make some requests;             
 `curl -vkL http://127.0.0.1:8081/serviceA`                
 Access jaeger to check on traces:              
-[http://127.0.0.1:16686/jaeger](localhost:16686/jaeger)            
+[localhost:16686/jaeger](http://127.0.0.1:16686/jaeger)            
 Notice that, not only do logs have traceId and spanID                
 ```sh
 {
@@ -20,7 +20,7 @@ But also the traces have logs;
 ![traces integrated with logs](confs/imgs/traces.png)                     
 
 Access prometheus to check on metrics:                  
-[http://127.0.0.1:9090/graph](localhost:9090/graph)                            
+[localhost:9090/graph](http://127.0.0.1:9090/graph)                            
 ![metrics](confs/imgs/metrics.png)                   
 
 
