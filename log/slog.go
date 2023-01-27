@@ -36,9 +36,7 @@ func NewSlog(ctx context.Context) *slog.Logger {
 // It;
 // (a) adds TraceIds & spanIds to logs.
 // (b) adds logs to the active span as events.
-type slogHandler struct {
-	h slog.Handler
-}
+type slogHandler struct{ h slog.Handler }
 
 func (s slogHandler) Enabled(_ slog.Level) bool { return true /* support all logging levels*/ }
 func (s slogHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
