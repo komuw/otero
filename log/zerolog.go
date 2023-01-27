@@ -12,20 +12,16 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-// type SeverityHook struct{}
-
-// func (h SeverityHook) Run(e *zerolog.Event, level zerolog.Level, msg string) {
-// 	e.
-// 	if level != zerolog.NoLevel {
-// 		e.Str("severity", level.String())
-// 	}
-// }
-
 var (
 	onceZerolog   sync.Once
 	zerologLogger zerolog.Logger
 )
 
+// usage:
+//
+//	ctx, span := tracer.Start(ctx, "multiply")
+//	l := NewZerolog(ctx)
+//	l.Info().Msg("hello world")
 func NewZerolog(ctx context.Context) zerolog.Logger {
 	onceZerolog.Do(func() {
 		zerolog.TimeFieldFormat = time.RFC3339Nano
