@@ -77,6 +77,9 @@ func zerologTraceHook(ctx context.Context) zerolog.HookFunc {
 			// code from: https://github.com/uptrace/opentelemetry-go-extra/tree/main/otellogrus
 			// whose license(BSD 2-Clause) can be found at: https://github.com/uptrace/opentelemetry-go-extra/blob/v0.1.18/LICENSE
 
+			// Unlike logrus or exp/slog, zerolog does not give hooks the ability to get the whole event/message with all its key-values
+			// see: https://github.com/rs/zerolog/issues/300
+
 			attrs := make([]attribute.KeyValue, 0)
 
 			logSeverityKey := attribute.Key("log.severity")
