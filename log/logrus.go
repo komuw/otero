@@ -1,4 +1,4 @@
-package main
+package log
 
 import (
 	"context"
@@ -17,17 +17,17 @@ import (
 )
 
 var (
-	once   sync.Once
-	logger *logrus.Entry
+	onceLogrus   sync.Once
+	logrusLogger *logrus.Entry
 )
 
 // usage:
 //
-//	ctx, span := tracer.Start(ctx, "multiply")
-//	l := New(ctx)
+//	ctx, span := tracer.Start(ctx, "myFuncName")
+//	l := NewLogrus(ctx)
 //	l.Info("hello world")
-func New(ctx context.Context) *logrus.Entry {
-	once.Do(func() {
+func NewLogrus(ctx context.Context) *logrus.Entry {
+	onceLogrus.Do(func() {
 		l := logrus.New()
 		l.SetLevel(logrus.TraceLevel)
 		l.Formatter = &logrus.JSONFormatter{
@@ -38,28 +38,29 @@ func New(ctx context.Context) *logrus.Entry {
 			},
 			TimestampFormat: time.RFC3339Nano,
 		}
-		l.AddHook(traceHook{})
-		logger = l.WithField("app", "my_demo_app")
+		l.AddHook(logrusTraceHook{})
+		l.SetReportCaller(true)
+		logrusLogger = l.WithField("app", "my_demo_app")
 	})
 
-	return logger.WithContext(ctx)
+	return logrusLogger.WithContext(ctx)
 }
 
-// traceHook is a hook that;
-// (a) adds TraceIds & spanIs to logs of all LogLevels
+// logrusTraceHook is a hook that;
+// (a) adds TraceIds & spanIds to logs of all LogLevels
 // (b) adds logs to the active span as events.
-type traceHook struct{}
+type logrusTraceHook struct{}
 
 // Levels define on which log levels this hook would trigger
-func (t traceHook) Levels() []logrus.Level {
+func (t logrusTraceHook) Levels() []logrus.Level {
 	return logrus.AllLevels
 }
 
 // Fire will be called when some logging function is called with current hook
 // It will;
-// (a) adds TraceIds & spanIs to logs of all LogLevels
+// (a) adds TraceIds & spanIds to logs of all LogLevels
 // (b) adds logs to the active span as events.
-func (t traceHook) Fire(entry *logrus.Entry) error {
+func (t logrusTraceHook) Fire(entry *logrus.Entry) error {
 	ctx := entry.Context
 	if ctx == nil {
 		return nil
@@ -69,7 +70,7 @@ func (t traceHook) Fire(entry *logrus.Entry) error {
 		return nil
 	}
 
-	{ // (a) adds TraceIds & spanIs to logs of all LogLevels
+	{ // (a) adds TraceIds & spanIds to logs.
 		//
 		// TODO: (komuw) add stackTraces maybe.
 		//
@@ -85,7 +86,7 @@ func (t traceHook) Fire(entry *logrus.Entry) error {
 	{ // (b) adds logs to the active span as events.
 
 		// code from: https://github.com/uptrace/opentelemetry-go-extra/tree/main/otellogrus
-		// which is BSD 2-Clause license.
+		// whose license(BSD 2-Clause) can be found at: https://github.com/uptrace/opentelemetry-go-extra/blob/v0.1.18/LICENSE
 
 		attrs := make([]attribute.KeyValue, 0, len(entry.Data)+2+3)
 
