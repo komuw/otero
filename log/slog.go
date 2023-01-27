@@ -47,7 +47,6 @@ func (s otelHandler) Enabled(_ slog.Level) bool { return true /* support all log
 func (s otelHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &otelHandler{h: s.h.WithAttrs(attrs)}
 }
-
 func (s otelHandler) WithGroup(name string) slog.Handler {
 	return &otelHandler{h: s.h.WithGroup(name)}
 }
