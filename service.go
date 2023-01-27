@@ -153,6 +153,9 @@ func add(ctx context.Context, x, y int64) int64 {
 
 		lz := log.NewZerolog(ctx)
 		lz.Info().Msg("zerolog: add called.")
+
+		ls := log.NewSlog(ctx)
+		ls.Info("slog: add called.")
 	}
 
 	return x + y

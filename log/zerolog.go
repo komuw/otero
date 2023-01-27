@@ -39,7 +39,7 @@ func NewZerolog(ctx context.Context) zerolog.Logger {
 }
 
 // zerologTraceHook is a hook that;
-// (a) adds TraceIds & spanIs to logs of all LogLevels
+// (a) adds TraceIds & spanIds to logs of all LogLevels
 // (b) adds logs to the active span as events.
 func zerologTraceHook(ctx context.Context) zerolog.HookFunc {
 	return func(e *zerolog.Event, level zerolog.Level, message string) {
@@ -59,7 +59,7 @@ func zerologTraceHook(ctx context.Context) zerolog.HookFunc {
 			return
 		}
 
-		{ // (a) adds TraceIds & spanIs to logs
+		{ // (a) adds TraceIds & spanIds to logs
 			//
 			// TODO: (komuw) add stackTraces maybe.
 			//
@@ -91,7 +91,7 @@ func zerologTraceHook(ctx context.Context) zerolog.HookFunc {
 
 			span.AddEvent("log", trace.WithAttributes(attrs...))
 			if level >= zerolog.ErrorLevel {
-				span.SetStatus(codes.Error, "message")
+				span.SetStatus(codes.Error, message)
 			}
 		}
 	}
