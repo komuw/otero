@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/komuw/otero/log"
+
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -34,7 +35,7 @@ func serviceA(ctx context.Context, port int) {
 		Handler: handler,
 	}
 
-	log := log.New(ctx)
+	log := log.NewLogrus(ctx)
 	log.Info("serviceA listening on: ", address)
 	err := server.ListenAndServe()
 	if err != nil {
@@ -61,7 +62,7 @@ func serviceB(ctx context.Context, port int) {
 		Handler: handler,
 	}
 
-	log := log.New(ctx)
+	log := log.NewLogrus(ctx)
 	log.Info("serviceB listening on: ", address)
 	err := server.ListenAndServe()
 	if err != nil {
@@ -79,7 +80,7 @@ func serviceA_HttpHandler(w http.ResponseWriter, r *http.Request) {
 	)
 	counter.Add(ctx, 1)
 
-	log := log.New(ctx)
+	log := log.NewLogrus(ctx)
 	log.Info("serviceA_HttpHandler called")
 
 	// When serviceA is called, it calls serviceB over tcp network.
@@ -119,7 +120,7 @@ func serviceB_HttpHandler(w http.ResponseWriter, r *http.Request) {
 	)
 	counter.Add(ctx, 1)
 
-	log := log.New(ctx)
+	log := log.NewLogrus(ctx)
 	log.Info("serviceB_HttpHandler called")
 
 	answer := add(ctx, 42, 1813)
@@ -145,8 +146,14 @@ func add(ctx context.Context, x, y int64) int64 {
 	err := errors.New("oops, 99 problems")
 	span.RecordError(err, trace.WithStackTrace(true))
 
-	log := log.New(ctx)
-	log.Println("add called.")
+	{ // Use different loggers.
+
+		lr := log.NewLogrus(ctx)
+		lr.Println("logrus: add called.")
+
+		lz := log.NewZerolog(ctx)
+		lz.Info().Msg("zerolog: add called.")
+	}
 
 	return x + y
 }

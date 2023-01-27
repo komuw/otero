@@ -17,17 +17,17 @@ import (
 )
 
 var (
-	once   sync.Once
-	logger *logrus.Entry
+	onceLogrus   sync.Once
+	logrusLogger *logrus.Entry
 )
 
 // usage:
 //
 //	ctx, span := tracer.Start(ctx, "multiply")
-//	l := New(ctx)
+//	l := NewLogrus(ctx)
 //	l.Info("hello world")
-func New(ctx context.Context) *logrus.Entry {
-	once.Do(func() {
+func NewLogrus(ctx context.Context) *logrus.Entry {
+	onceLogrus.Do(func() {
 		l := logrus.New()
 		l.SetLevel(logrus.TraceLevel)
 		l.Formatter = &logrus.JSONFormatter{
@@ -38,20 +38,21 @@ func New(ctx context.Context) *logrus.Entry {
 			},
 			TimestampFormat: time.RFC3339Nano,
 		}
-		l.AddHook(traceHook{})
-		logger = l.WithField("app", "my_demo_app")
+		l.AddHook(logrusTraceHook{})
+		l.SetReportCaller(true)
+		logrusLogger = l.WithField("app", "my_demo_app")
 	})
 
-	return logger.WithContext(ctx)
+	return logrusLogger.WithContext(ctx)
 }
 
-// traceHook is a hook that;
+// logrusTraceHook is a hook that;
 // (a) adds TraceIds & spanIs to logs of all LogLevels
 // (b) adds logs to the active span as events.
-type traceHook struct{}
+type logrusTraceHook struct{}
 
 // Levels define on which log levels this hook would trigger
-func (t traceHook) Levels() []logrus.Level {
+func (t logrusTraceHook) Levels() []logrus.Level {
 	return logrus.AllLevels
 }
 
@@ -59,7 +60,7 @@ func (t traceHook) Levels() []logrus.Level {
 // It will;
 // (a) adds TraceIds & spanIs to logs of all LogLevels
 // (b) adds logs to the active span as events.
-func (t traceHook) Fire(entry *logrus.Entry) error {
+func (t logrusTraceHook) Fire(entry *logrus.Entry) error {
 	ctx := entry.Context
 	if ctx == nil {
 		return nil

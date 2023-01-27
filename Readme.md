@@ -22,3 +22,28 @@ But also the traces have logs;
 Access prometheus to check on metrics:                  
 (localhost:9090/graph)[http://127.0.0.1:9090/graph]                            
 ![metrics](confs/metrics.png)                   
+
+We also added integration of tracing and logs for both logrus and zerolog;     
+```sh
+{
+    "level":"info",
+    "app":"my_demo_app",
+    "time":"2023-01-27T07:09:58.444782364Z",
+    "caller":"/src/service.go:155",
+    "traceId":"034456796123896d2b132c932b197dea",
+    "spanId":"025f0abd50248e15",
+    "message":"zerolog: add called."
+}
+
+{
+    "app":"my_demo_app",
+    "file":"/src/service.go:152",
+    "func":"main.add",
+    "message":"logrus: add called.",
+    "severity":"info",
+    "traceId":"6280224dcd81df78ca9a262370c730eb",
+    "spanId":"674e48ff133273fa",
+    "timestamp":"2023-01-27T07:09:59.153752332Z",
+}
+```
+![traces integrated with logrus and zerolog](confs/logrus_zerolog.png)  
