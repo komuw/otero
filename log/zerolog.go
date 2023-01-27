@@ -59,7 +59,7 @@ func zerologTraceHook(ctx context.Context) zerolog.HookFunc {
 			return
 		}
 
-		{ // (a) adds TraceIds & spanIds to logs
+		{ // (a) adds TraceIds & spanIds to logs.
 			//
 			// TODO: (komuw) add stackTraces maybe.
 			//

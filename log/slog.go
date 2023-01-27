@@ -63,7 +63,7 @@ func (s otelHandler) Handle(r slog.Record) (err error) {
 		return s.h.Handle(r)
 	}
 
-	{ // (a) adds TraceIds & spanIds to logs
+	{ // (a) adds TraceIds & spanIds to logs.
 		//
 		// TODO: (komuw) add stackTraces maybe.
 		//

@@ -70,7 +70,7 @@ func (t logrusTraceHook) Fire(entry *logrus.Entry) error {
 		return nil
 	}
 
-	{ // (a) adds TraceIds & spanIds to logs of all LogLevels
+	{ // (a) adds TraceIds & spanIds to logs.
 		//
 		// TODO: (komuw) add stackTraces maybe.
 		//
