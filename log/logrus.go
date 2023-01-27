@@ -23,7 +23,7 @@ var (
 
 // usage:
 //
-//	ctx, span := tracer.Start(ctx, "multiply")
+//	ctx, span := tracer.Start(ctx, "myFuncName")
 //	l := NewLogrus(ctx)
 //	l.Info("hello world")
 func NewLogrus(ctx context.Context) *logrus.Entry {
@@ -47,7 +47,7 @@ func NewLogrus(ctx context.Context) *logrus.Entry {
 }
 
 // logrusTraceHook is a hook that;
-// (a) adds TraceIds & spanIs to logs of all LogLevels
+// (a) adds TraceIds & spanIds to logs of all LogLevels
 // (b) adds logs to the active span as events.
 type logrusTraceHook struct{}
 
@@ -58,7 +58,7 @@ func (t logrusTraceHook) Levels() []logrus.Level {
 
 // Fire will be called when some logging function is called with current hook
 // It will;
-// (a) adds TraceIds & spanIs to logs of all LogLevels
+// (a) adds TraceIds & spanIds to logs of all LogLevels
 // (b) adds logs to the active span as events.
 func (t logrusTraceHook) Fire(entry *logrus.Entry) error {
 	ctx := entry.Context
@@ -70,7 +70,7 @@ func (t logrusTraceHook) Fire(entry *logrus.Entry) error {
 		return nil
 	}
 
-	{ // (a) adds TraceIds & spanIs to logs of all LogLevels
+	{ // (a) adds TraceIds & spanIds to logs.
 		//
 		// TODO: (komuw) add stackTraces maybe.
 		//
@@ -86,7 +86,7 @@ func (t logrusTraceHook) Fire(entry *logrus.Entry) error {
 	{ // (b) adds logs to the active span as events.
 
 		// code from: https://github.com/uptrace/opentelemetry-go-extra/tree/main/otellogrus
-		// which is BSD 2-Clause license.
+		// whose license(BSD 2-Clause) can be found at: https://github.com/uptrace/opentelemetry-go-extra/blob/v0.1.18/LICENSE
 
 		attrs := make([]attribute.KeyValue, 0, len(entry.Data)+2+3)
 

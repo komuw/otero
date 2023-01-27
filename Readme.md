@@ -23,27 +23,38 @@ Access prometheus to check on metrics:
 (localhost:9090/graph)[http://127.0.0.1:9090/graph]                            
 ![metrics](confs/imgs/metrics.png)                   
 
-We also added integration of tracing and logs for both logrus and zerolog;     
+We also added integration of tracing and logs for both logrus, zerolog & slog;     
 ```sh
 {
+    "time":"2023-01-27T07:09:58.444782364Z",
     "level":"info",
     "app":"my_demo_app",
-    "time":"2023-01-27T07:09:58.444782364Z",
     "caller":"/src/service.go:155",
+    "message":"zerolog: add called."
     "traceId":"034456796123896d2b132c932b197dea",
     "spanId":"025f0abd50248e15",
-    "message":"zerolog: add called."
 }
 
 {
+    "timestamp":"2023-01-27T07:09:59.153752332Z",
+    "severity":"info",
     "app":"my_demo_app",
     "file":"/src/service.go:152",
     "func":"main.add",
     "message":"logrus: add called.",
-    "severity":"info",
     "traceId":"6280224dcd81df78ca9a262370c730eb",
-    "spanId":"674e48ff133273fa",
-    "timestamp":"2023-01-27T07:09:59.153752332Z",
+    "spanId":"674e48ff133273fa"
+}
+
+{
+    "time":"2023-01-27T08:34:42.805542202Z",
+    "level":"INFO",
+    "app":"my_demo_app",
+    "source":"/src/service.go:158",
+    "msg":"slog: add called.",
+    "app":"my_demo_app",
+    "traceId":"1cdc62f79dc4b25065f872a95047ab37",
+    "spanId":"ea1c18556211039c"
 }
 ```
-![traces integrated with logrus and zerolog](confs/imgs/logrus_zerolog.png)  
+![traces integrated with logrus and zerolog](confs/imgs/logrus_zerolog_slog.png)  
