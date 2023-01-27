@@ -2,7 +2,6 @@ package log
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"sync"
 
@@ -24,7 +23,8 @@ func NewSlog(ctx context.Context) *slog.Logger {
 			Level:     slog.LevelDebug,
 		}
 		jh := opts.NewJSONHandler(os.Stdout)
-		h := &slogHandler{h: jh}
+
+		h := slogHandler{h: jh}
 		l := slog.New(h).With("app", "my_demo_app")
 		slogLogger = l
 	})
@@ -37,29 +37,34 @@ func NewSlog(ctx context.Context) *slog.Logger {
 // (a) adds TraceIds & spanIds to logs.
 // (b) adds logs to the active span as events.
 type slogHandler struct {
-	h *slog.JSONHandler
+	h slog.Handler
 }
 
-func (s *slogHandler) Enabled(_ slog.Level) bool                { return true /* support all logging levels*/ }
-func (s *slogHandler) WithAttrs(attrs []slog.Attr) slog.Handler { return s.h.WithAttrs(attrs) }
-func (s *slogHandler) WithGroup(name string) slog.Handler       { return s.h.WithGroup(name) }
+func (s slogHandler) Enabled(_ slog.Level) bool { return true /* support all logging levels*/ }
+func (s slogHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
+	return &slogHandler{h: s.h.WithAttrs(attrs)}
+}
 
-func (s *slogHandler) Handle(r slog.Record) (err error) {
-	fmt.Fprintln(os.Stderr, "\n\t called.")
+func (s slogHandler) WithGroup(name string) slog.Handler {
+	return &slogHandler{h: s.h.WithGroup(name)}
+}
 
-	defer func() {
-		err = s.h.Handle(r)
-		fmt.Fprintln(os.Stderr, "\n\t err: ", err)
-	}()
+func (s slogHandler) Handle(r slog.Record) (err error) {
+	// defer func(e error) {
+	// 	e = s.h.Handle(r)
+	// 	fmt.Println("\n\t Handle end. err: ", err)
+	// }(err)
+
+	// err = errors.New("Komu")
 
 	ctx := r.Context
 	if ctx == nil {
-		return nil
+		return s.h.Handle(r)
 	}
 
 	span := trace.SpanFromContext(ctx)
 	if !span.IsRecording() {
-		return nil
+		return s.h.Handle(r)
 	}
 
 	{ // (a) adds TraceIds & spanIds to logs
@@ -102,5 +107,5 @@ func (s *slogHandler) Handle(r slog.Record) (err error) {
 		}
 	}
 
-	return nil
+	return s.h.Handle(r)
 }
