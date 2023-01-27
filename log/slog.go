@@ -50,13 +50,6 @@ func (s slogHandler) WithGroup(name string) slog.Handler {
 }
 
 func (s slogHandler) Handle(r slog.Record) (err error) {
-	// defer func(e error) {
-	// 	e = s.h.Handle(r)
-	// 	fmt.Println("\n\t Handle end. err: ", err)
-	// }(err)
-
-	// err = errors.New("Komu")
-
 	ctx := r.Context
 	if ctx == nil {
 		return s.h.Handle(r)
