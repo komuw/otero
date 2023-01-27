@@ -23,7 +23,7 @@ Access prometheus to check on metrics:
 (localhost:9090/graph)[http://127.0.0.1:9090/graph]                            
 ![metrics](confs/imgs/metrics.png)                   
 
-We also added integration of tracing and logs for both logrus, zerolog & slog;     
+We also added integration of tracing and logs for both (logrus)[https://github.com/sirupsen/logrus], zerolog & slog;     
 ```sh
 {
     "time":"2023-01-27T07:09:58.444782364Z",
