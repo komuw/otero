@@ -24,7 +24,7 @@ func NewSlog(ctx context.Context) *slog.Logger {
 		}
 		jh := opts.NewJSONHandler(os.Stdout)
 
-		h := slogHandler{h: jh}
+		h := otelHandler{h: jh}
 		l := slog.New(h).With("app", "my_demo_app")
 		slogLogger = l
 	})
@@ -32,22 +32,22 @@ func NewSlog(ctx context.Context) *slog.Logger {
 	return slogLogger.WithContext(ctx)
 }
 
-// slogHandler implements the slog.Handler
-// It;
-// (a) adds TraceIds & spanIds to logs.
-// (b) adds logs to the active span as events.
-type slogHandler struct{ h slog.Handler }
+// otelHandler implements slog.Handler
+// It adds;
+// (a) TraceIds & spanIds to logs.
+// (b) Logs(as events) to the active span.
+type otelHandler struct{ h slog.Handler }
 
-func (s slogHandler) Enabled(_ slog.Level) bool { return true /* support all logging levels*/ }
-func (s slogHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
-	return &slogHandler{h: s.h.WithAttrs(attrs)}
+func (s otelHandler) Enabled(_ slog.Level) bool { return true /* support all logging levels*/ }
+func (s otelHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
+	return &otelHandler{h: s.h.WithAttrs(attrs)}
 }
 
-func (s slogHandler) WithGroup(name string) slog.Handler {
-	return &slogHandler{h: s.h.WithGroup(name)}
+func (s otelHandler) WithGroup(name string) slog.Handler {
+	return &otelHandler{h: s.h.WithGroup(name)}
 }
 
-func (s slogHandler) Handle(r slog.Record) (err error) {
+func (s otelHandler) Handle(r slog.Record) (err error) {
 	ctx := r.Context
 	if ctx == nil {
 		return s.h.Handle(r)
