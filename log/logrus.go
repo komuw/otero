@@ -86,7 +86,7 @@ func (t logrusTraceHook) Fire(entry *logrus.Entry) error {
 	{ // (b) adds logs to the active span as events.
 
 		// code from: https://github.com/uptrace/opentelemetry-go-extra/tree/main/otellogrus
-		// which is BSD 2-Clause license.
+		// whose license(BSD 2-Clause) can be found at: https://github.com/uptrace/opentelemetry-go-extra/blob/v0.1.18/LICENSE
 
 		attrs := make([]attribute.KeyValue, 0, len(entry.Data)+2+3)
 

@@ -80,9 +80,6 @@ func (s otelHandler) Handle(r slog.Record) (err error) {
 		// code from: https://github.com/uptrace/opentelemetry-go-extra/tree/main/otellogrus
 		// which is BSD 2-Clause license.
 
-		// Unlike logrus, zerolog does not give hooks the ability to get the whole event/message with all its key-values
-		// see: https://github.com/rs/zerolog/issues/300
-
 		attrs := make([]attribute.KeyValue, 0)
 
 		logSeverityKey := attribute.Key("log.severity")
