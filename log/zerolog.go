@@ -19,7 +19,7 @@ var (
 
 // usage:
 //
-//	ctx, span := tracer.Start(ctx, "multiply")
+//	ctx, span := tracer.Start(ctx, "myFuncName")
 //	l := NewZerolog(ctx)
 //	l.Info().Msg("hello world")
 func NewZerolog(ctx context.Context) zerolog.Logger {

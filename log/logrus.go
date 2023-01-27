@@ -23,7 +23,7 @@ var (
 
 // usage:
 //
-//	ctx, span := tracer.Start(ctx, "multiply")
+//	ctx, span := tracer.Start(ctx, "myFuncName")
 //	l := NewLogrus(ctx)
 //	l.Info("hello world")
 func NewLogrus(ctx context.Context) *logrus.Entry {

@@ -18,7 +18,7 @@ var (
 
 // usage:
 //
-//	ctx, span := tracer.Start(ctx, "multiply")
+//	ctx, span := tracer.Start(ctx, "myFuncName")
 //	l := NewSlog(ctx)
 //	l.Info("hello world")
 func NewSlog(ctx context.Context) *slog.Logger {
