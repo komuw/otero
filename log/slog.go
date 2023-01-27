@@ -16,6 +16,11 @@ var (
 	slogLogger *slog.Logger
 )
 
+// usage:
+//
+//	ctx, span := tracer.Start(ctx, "multiply")
+//	l := NewSlog(ctx)
+//	l.Info("hello world")
 func NewSlog(ctx context.Context) *slog.Logger {
 	onceSlog.Do(func() {
 		opts := slog.HandlerOptions{
