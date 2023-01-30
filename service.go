@@ -78,7 +78,15 @@ func serviceA_HttpHandler(w http.ResponseWriter, r *http.Request) {
 		"service_a_called_counter",
 		instrument.WithDescription("how many time the serviceA handler has been called."),
 	)
-	counter.Add(ctx, 1)
+	counter.Add(
+		ctx,
+		1,
+		// labels/tags
+		[]attribute.KeyValue{
+			attribute.String("handler_name", "serviceA_HttpHandler"),
+			attribute.Int64("req_size", r.ContentLength),
+		}...,
+	)
 
 	log := log.NewLogrus(ctx)
 	log.Info("serviceA_HttpHandler called")
