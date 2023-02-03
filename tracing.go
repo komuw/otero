@@ -11,31 +11,12 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
 	"google.golang.org/grpc/credentials"
 )
 
-func getTls() (*tls.Config, error) {
-	clientAuth, err := tls.LoadX509KeyPair("./confs/tls/client.crt", "./confs/tls/client.key")
-	if err != nil {
-		return nil, err
-	}
-
-	caCert, err := os.ReadFile("./confs/tls/rootCA.crt")
-	if err != nil {
-		return nil, err
-	}
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(caCert)
-
-	return &tls.Config{
-		RootCAs:      caCertPool,
-		Certificates: []tls.Certificate{clientAuth},
-	}, nil
-}
-
-func setupTracing(ctx context.Context, serviceName string) (*sdktrace.TracerProvider, error) {
+func setupTracing(ctx context.Context, serviceName string) (*trace.TracerProvider, error) {
 	/*
 		Alternative ways of providing an exporter:
 		see: https://github.com/open-telemetry/opentelemetry-go/tree/v1.2.0/exporters
@@ -64,7 +45,7 @@ func setupTracing(ctx context.Context, serviceName string) (*sdktrace.TracerProv
 			// mutual tls.
 			credentials.NewTLS(c),
 		),
-		// You can use `WithInsecure` in non-prod purposes.
+		// You can use `WithInsecure` for non-production purposes.
 		// otlptracegrpc.WithInsecure(),
 	)
 	if err != nil {
@@ -80,10 +61,10 @@ func setupTracing(ctx context.Context, serviceName string) (*sdktrace.TracerProv
 		attribute.String("name", "komu"),
 	)
 
-	provider := sdktrace.NewTracerProvider(
-		sdktrace.WithBatcher(exporter), // use batch in prod.
-		sdktrace.WithResource(resource),
-		sdktrace.WithSpanProcessor(loggingSpanProcessor{}),
+	provider := trace.NewTracerProvider(
+		trace.WithBatcher(exporter), // use batch in prod.
+		trace.WithResource(resource),
+		trace.WithSpanProcessor(loggingSpanProcessor{}),
 		// see: https://opentelemetry.io/docs/go/exporting_data/#sampling
 		// In prod, you should consider using the TraceIDRatioBased sampler with the ParentBased sampler.
 		// sdktrace.WithSampler(sdktrace.AlwaysSample()),
@@ -123,7 +104,7 @@ func setupTracing(ctx context.Context, serviceName string) (*sdktrace.TracerProv
 // loggingSpanProcessor logs at end of a span.
 type loggingSpanProcessor struct{}
 
-func (c loggingSpanProcessor) OnEnd(s sdktrace.ReadOnlySpan) {
+func (c loggingSpanProcessor) OnEnd(s trace.ReadOnlySpan) {
 	// TODO: (komuw) merge s.Attributes() +  s.Resource() + s.Events()[maybe]
 	// attrSet := attribute.NewSet(s.Attributes()...)
 	// log.Println("\n\n\t onEnd called.",
@@ -138,6 +119,28 @@ func (c loggingSpanProcessor) OnEnd(s sdktrace.ReadOnlySpan) {
 	// )
 }
 
-func (c loggingSpanProcessor) OnStart(parent context.Context, s sdktrace.ReadWriteSpan) {}
-func (c loggingSpanProcessor) ForceFlush(ctx context.Context) error                     { return nil }
-func (c loggingSpanProcessor) Shutdown(ctx context.Context) error                       { return nil }
+func (c loggingSpanProcessor) OnStart(parent context.Context, s trace.ReadWriteSpan) {}
+func (c loggingSpanProcessor) ForceFlush(ctx context.Context) error                  { return nil }
+func (c loggingSpanProcessor) Shutdown(ctx context.Context) error                    { return nil }
+
+// getTls returns a configuration that enables the use of mutual TLS.
+func getTls() (*tls.Config, error) {
+	clientAuth, err := tls.LoadX509KeyPair("./confs/tls/client.crt", "./confs/tls/client.key")
+	if err != nil {
+		return nil, err
+	}
+
+	caCert, err := os.ReadFile("./confs/tls/rootCA.crt")
+	if err != nil {
+		return nil, err
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	c := &tls.Config{
+		RootCAs:      caCertPool,
+		Certificates: []tls.Certificate{clientAuth},
+	}
+
+	return c, nil
+}
