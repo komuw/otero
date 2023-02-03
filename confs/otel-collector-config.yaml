@@ -21,6 +21,13 @@ receivers:
   otlp:
     protocols:
       grpc:
+        endpoint: 0.0.0.0:4317
+        tls:
+          # insecure: false
+          cert_file: /etc/tls/server.crt
+          key_file: /etc/tls/server.key
+          ca_file: /etc/tls/rootCA.crt        # For a client this verifies the server certificate. For a server this verifies client certificates. If empty uses system root CA.
+          client_ca_file: /etc/tls/rootCA.crt #  Path to the TLS cert to use by the server to verify a client certificate.
       # http:
 
 # (b) Processors

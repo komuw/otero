@@ -7,6 +7,10 @@ coverage.out
 .DS_Store
 
 
+*.crt
+*.key
+*.csr
+*.srl
 confs/otel_file_exporter.json
 
 # go-pry debug stuff

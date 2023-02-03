@@ -11,6 +11,7 @@ import (
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
+	"google.golang.org/grpc/credentials"
 )
 
 func getMeter() metric.Meter {
@@ -52,10 +53,20 @@ func setupMetrics(ctx context.Context, serviceName string) (*sdkmetric.MeterProv
 		exporter, err := prometheus.New()
 	*/
 
+	c, err := getTls()
+	if err != nil {
+		return nil, err
+	}
+
 	exporter, err := otlpmetricgrpc.New(
 		ctx,
 		otlpmetricgrpc.WithEndpoint("otel_collector:4317"),
-		otlpmetricgrpc.WithInsecure(),
+		otlpmetricgrpc.WithTLSCredentials(
+			// mutual tls.
+			credentials.NewTLS(c),
+		),
+		// You can use `WithInsecure` for non-production purposes.
+		// otlptracegrpc.WithInsecure(),
 	)
 	if err != nil {
 		return nil, err

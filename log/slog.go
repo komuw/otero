@@ -48,6 +48,7 @@ type otelHandler struct{ h slog.Handler }
 func (s otelHandler) Enabled(_ context.Context, _ slog.Level) bool {
 	return true /* support all logging levels*/
 }
+
 func (s otelHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &otelHandler{h: s.h.WithAttrs(attrs)}
 }

@@ -2,8 +2,10 @@
 
 start;            
 ```sh
-touch confs/file_exporter.json
-chmod 777 confs/file_exporter.json
+bash certs.sh
+touch confs/otel_file_exporter.json
+chmod 666 confs/otel_file_exporter.json # otel-collector docker image has no writable file-system
+chmod 666 confs/tls/server.crt confs/tls/server.key confs/tls/rootCA.crt
 docker-compose up --build
 ```                
 Make some requests;             
