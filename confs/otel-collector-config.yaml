@@ -44,20 +44,24 @@ processors:
 # An exporter, which can be push or pull based, is how you send data to one or more destinations.
 
 exporters:
-  # TODO: add file exporter.
   # Data sources: traces, metrics, logs
-  # file:
-  #   path: ./otel_exported.json
+  file/mine: # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/fileexporter
+    path: /etc/otel_file_exporter.json
+    rotation:
+      max_megabytes: 1 # max size in megabytes b4 rotation.
+      max_backups: 2
+      localtime: true
+    format: json
 
   # Data sources: traces, metrics, logs
   # logging:
   #   loglevel: debug
 
   # Data sources: traces, metrics, logs
-  otlp:
-    endpoint: otel_collector:4317
-    # headers:
-    #   header1: "header-value1"
+  # otlp:
+  #   endpoint: otel_collector:4317
+  #   headers:
+  #     header1: "header-value1"
 
   # Data sources: traces, metrics
   jaeger:
@@ -93,13 +97,13 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [ otlp, jaeger]
+      exporters: [file/mine, jaeger]
     metrics:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [ otlp, prometheus]
+      exporters: [file/mine, prometheus]
     logs:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [ otlp]
+      exporters: [file/mine]
   # telemetry: # Telemetry is where the telemetry for the collector itself can be configured.

@@ -74,7 +74,7 @@ func serviceA_HttpHandler(w http.ResponseWriter, r *http.Request) {
 	ctx, span := otel.Tracer(tracerName).Start(r.Context(), "serviceA_HttpHandler")
 	defer span.End()
 
-	counter, _ := getMeter().SyncInt64().Counter(
+	counter, _ := getMeter().Int64Counter(
 		"service_a_called_counter",
 		instrument.WithDescription("how many time the serviceA handler has been called."),
 	)
@@ -122,7 +122,7 @@ func serviceB_HttpHandler(w http.ResponseWriter, r *http.Request) {
 	ctx, span := otel.Tracer(tracerName).Start(r.Context(), "serviceB_HttpHandler")
 	defer span.End()
 
-	counter, _ := getMeter().SyncInt64().Counter(
+	counter, _ := getMeter().Int64Counter(
 		"serviceB_call_counter",
 		instrument.WithDescription("how many time the serviceB handler has been called."),
 	)
@@ -163,8 +163,8 @@ func add(ctx context.Context, x, y int64) int64 {
 		lz.Info().Msg("zerolog: add called.")
 
 		ls := log.NewSlog(ctx)
-		ls.Info("hello from slog logger.")
-		ls.Debug("some msg", "age", 56)
+		ls.Info("slog: add called.")
+		ls.Debug("slog: some msg", "age", 56)
 	}
 
 	return x + y

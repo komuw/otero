@@ -6,6 +6,9 @@ coverage.html
 coverage.out
 .DS_Store
 
+
+confs/otel_file_exporter.json
+
 # go-pry debug stuff
 .main.gopry
 
