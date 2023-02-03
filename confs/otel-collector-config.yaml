@@ -46,10 +46,10 @@ processors:
 exporters:
   # Data sources: traces, metrics, logs
   file/mine: # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/fileexporter
-    path: /tmp
+    path: /etc/otel_file_exporter.json
     rotation:
-      max_megabytes: 10 # max size in megabytes b4 rotation.
-      max_backups: 3
+      max_megabytes: 1 # max size in megabytes b4 rotation.
+      max_backups: 2
       localtime: true
     format: json
 

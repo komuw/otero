@@ -1,7 +1,11 @@
 `otero` is a sample app that has logs, traces and metrics integrated together.                  
 
 start;            
-`docker-compose up --build`                
+```sh
+touch confs/file_exporter.json
+chmod 777 confs/file_exporter.json
+docker-compose up --build
+```                
 Make some requests;             
 `curl -vkL http://127.0.0.1:8081/serviceA`                
 Access jaeger to check on traces:              
