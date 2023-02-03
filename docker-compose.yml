@@ -93,6 +93,9 @@ services:
     volumes:
       - ./confs/otel-collector-config.yaml:/etc/otel-collector-config.yaml
       - ./confs/otel_file_exporter.json:/etc/otel_file_exporter.json
+      # The official opentelemetry-collector-contrib container does not have a writable filesystem(its built from scratch docker image)
+      # Hence, we need to add this file and make it writabe; `chmod 777 confs/file_exporter.json`
+      # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/fileexporter
     ports:
       - "4317:4317" # OTLP over gRPC receiver
       - "4318:4318" # OTLP over HTTP receiver
