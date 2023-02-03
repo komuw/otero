@@ -1,6 +1,6 @@
 module github.com/komuw/otero
 
-go 1.19
+go 1.20
 
 require (
 	github.com/rs/zerolog v1.29.0
@@ -14,6 +14,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.35.0
 	go.opentelemetry.io/otel/trace v1.12.0
 	golang.org/x/exp v0.0.0-20230202163644-54bba9f4231b
+	google.golang.org/grpc v1.52.3
 )
 
 require (
@@ -33,6 +34,5 @@ require (
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/text v0.6.0 // indirect
 	google.golang.org/genproto v0.0.0-20230202175211-008b39050e57 // indirect
-	google.golang.org/grpc v1.52.3 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 )

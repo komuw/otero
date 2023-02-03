@@ -2,16 +2,38 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"os"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
-
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"google.golang.org/grpc/credentials"
 )
+
+func getTls() (*tls.Config, error) {
+	clientAuth, err := tls.LoadX509KeyPair("./confs/tls/client.crt", "./confs/tls/client.key")
+	if err != nil {
+		return nil, err
+	}
+
+	caCert, err := os.ReadFile("./confs/tls/rootCA.crt")
+	if err != nil {
+		return nil, err
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	return &tls.Config{
+		RootCAs:      caCertPool,
+		Certificates: []tls.Certificate{clientAuth},
+	}, nil
+}
 
 func setupTracing(ctx context.Context, serviceName string) (*sdktrace.TracerProvider, error) {
 	/*
@@ -30,10 +52,20 @@ func setupTracing(ctx context.Context, serviceName string) (*sdktrace.TracerProv
 		exporter, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
 	*/
 
+	c, err := getTls()
+	if err != nil {
+		return nil, err
+	}
+
 	exporter, err := otlptracegrpc.New(
 		ctx,
 		otlptracegrpc.WithEndpoint("otel_collector:4317"),
-		otlptracegrpc.WithInsecure(),
+		otlptracegrpc.WithTLSCredentials(
+			// mutual tls.
+			credentials.NewTLS(c),
+		),
+		// You can use `WithInsecure` in non-prod purposes.
+		// otlptracegrpc.WithInsecure(),
 	)
 	if err != nil {
 		return nil, err

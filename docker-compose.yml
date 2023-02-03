@@ -41,7 +41,7 @@ services:
   # ********************
   # Jaeger
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:1.41.0
     command:
       - "--memory.max-traces"
       - "10000"
@@ -69,7 +69,7 @@ services:
 
   # Prometheus
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v2.42.0
     container_name: prometheus
     command:
       - --web.console.templates=/etc/prometheus/consoles
@@ -88,11 +88,12 @@ services:
 
   # OpenTelemetry Collector
   otel_collector:
-    image: otel/opentelemetry-collector-contrib:latest
+    image: otel/opentelemetry-collector-contrib:0.70.0
     command: --config=/etc/otel-collector-config.yaml
     volumes:
       - ./confs/otel-collector-config.yaml:/etc/otel-collector-config.yaml
       - ./confs/otel_file_exporter.json:/etc/otel_file_exporter.json
+      - ./confs/tls:/etc/tls
       # The official opentelemetry-collector-contrib container does not have a writable filesystem(its built from scratch docker image)
       # Hence, we need to add this file and make it writabe; `chmod 777 confs/file_exporter.json`
       # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/fileexporter
