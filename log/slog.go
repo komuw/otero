@@ -16,6 +16,8 @@ var (
 	slogLogger *slog.Logger
 )
 
+// Also see: https://github.com/jba/slog/blob/main/trace/trace.go
+
 // usage:
 //
 //	ctx, span := tracer.Start(ctx, "myFuncName")
