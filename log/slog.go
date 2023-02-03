@@ -43,7 +43,9 @@ func NewSlog(ctx context.Context) *slog.Logger {
 // (b) Logs(as events) to the active span.
 type otelHandler struct{ h slog.Handler }
 
-func (s otelHandler) Enabled(_ slog.Level) bool { return true /* support all logging levels*/ }
+func (s otelHandler) Enabled(_ context.Context, _ slog.Level) bool {
+	return true /* support all logging levels*/
+}
 func (s otelHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	return &otelHandler{h: s.h.WithAttrs(attrs)}
 }
