@@ -21,7 +21,7 @@ receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: 0.0.0.0:4317
+        endpoint: 0.0.0.0:4317 # It is important that we do not use localhost
         tls:
           # insecure: false
           cert_file: /etc/tls/server.crt
