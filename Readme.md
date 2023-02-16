@@ -1,6 +1,6 @@
 `otero` is a sample app that has logs, traces and metrics integrated together.                  
 
-Also see my blogpost; [The complete guide to OpenTelemetry and Golang](https://www.komu.engineer/blogs/11/opentelemetry-and-go.html)               
+Also see my blogpost; [The complete guide to OpenTelemetry in Golang](https://www.komu.engineer/blogs/11/opentelemetry-and-go.html)               
 
 start;            
 ```sh
