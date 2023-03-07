@@ -52,6 +52,7 @@ setup_certs(){
   { # clean
     rm -rf confs/tls/*.csr
     rm -rf confs/tls/*.srl
+    rm -rf confs/otel_file_exporter.json
 
     touch confs/otel_file_exporter.json
     chmod 666 confs/otel_file_exporter.json # otel-collector docker image has no writable file-system

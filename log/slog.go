@@ -3,7 +3,6 @@ package log
 import (
 	"context"
 	"os"
-	"sync"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -11,10 +10,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-var (
-	onceSlog   sync.Once
-	slogLogger *slog.Logger
-)
+var slogLogger *slog.Logger
 
 // Also see: https://github.com/jba/slog/blob/main/trace/trace.go
 
@@ -24,63 +20,69 @@ var (
 //	l := NewSlog(ctx)
 //	l.Info("hello world")
 func NewSlog(ctx context.Context) *slog.Logger {
-	onceSlog.Do(func() {
-		opts := slog.HandlerOptions{
-			AddSource: true,
-			Level:     slog.LevelDebug,
-		}
-		jh := opts.NewJSONHandler(os.Stdout)
+	opts := slog.HandlerOptions{
+		AddSource: true,
+		Level:     slog.LevelDebug,
+	}
+	jh := opts.NewJSONHandler(os.Stdout)
 
-		h := otelHandler{h: jh}
-		l := slog.New(h).With("app", "my_demo_app")
-		slogLogger = l
-	})
+	h := otelHandler{h: jh, ctx: ctx}
+	l := slog.New(h).With("app", "my_demo_app")
+	slogLogger = l
 
-	return slogLogger.WithContext(ctx)
+	traceId, spanId := getIds(ctx)
+	if traceId != "" && spanId != "" {
+		return slogLogger.With("traceId", traceId, "spanId", spanId)
+	}
+
+	return slogLogger
 }
 
 // otelHandler implements slog.Handler
 // It adds;
 // (a) TraceIds & spanIds to logs.
 // (b) Logs(as events) to the active span.
-type otelHandler struct{ h slog.Handler }
+type otelHandler struct {
+	h slog.Handler
+	// Do not store Contexts inside a struct type; https://pkg.go.dev/context
+	// todo: do better in future.
+	ctx context.Context
+}
 
 func (s otelHandler) Enabled(_ context.Context, _ slog.Level) bool {
 	return true /* support all logging levels*/
 }
 
 func (s otelHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
-	return otelHandler{h: s.h.WithAttrs(attrs)}
+	return otelHandler{h: s.h.WithAttrs(attrs), ctx: s.ctx}
 }
 
 func (s otelHandler) WithGroup(name string) slog.Handler {
-	return otelHandler{h: s.h.WithGroup(name)}
+	return otelHandler{h: s.h.WithGroup(name), ctx: s.ctx}
 }
 
-func (s otelHandler) Handle(r slog.Record) (err error) {
-	ctx := r.Context
-	if ctx == nil {
-		return s.h.Handle(r)
+func (s otelHandler) Handle(ctx context.Context, r slog.Record) error {
+	span := trace.SpanFromContext(ctx)
+	if !span.SpanContext().IsValid() {
+		span = trace.SpanFromContext(s.ctx)
 	}
 
-	span := trace.SpanFromContext(ctx)
 	if !span.IsRecording() {
-		return s.h.Handle(r)
+		return s.h.Handle(ctx, r)
 	}
 
 	{ // (a) adds TraceIds & spanIds to logs.
 		//
-		// TODO: (komuw) add stackTraces maybe.
+		// TODO:
+		//   (a) (komuw) add stackTraces maybe.
+		//   (b) there's a bug here, where sometimes duplicate traceId/spanId can be added.
 		//
 		sCtx := span.SpanContext()
 		attrs := make([]slog.Attr, 0)
-		if sCtx.HasTraceID() {
+		traceId, spanId := getIds(ctx)
+		if traceId != "" && spanId != "" {
 			attrs = append(attrs,
 				slog.Attr{Key: "traceId", Value: slog.StringValue(sCtx.TraceID().String())},
-			)
-		}
-		if sCtx.HasSpanID() {
-			attrs = append(attrs,
 				slog.Attr{Key: "spanId", Value: slog.StringValue(sCtx.SpanID().String())},
 			)
 		}
@@ -123,5 +125,26 @@ func (s otelHandler) Handle(r slog.Record) (err error) {
 		}
 	}
 
-	return s.h.Handle(r)
+	return s.h.Handle(ctx, r)
+}
+
+func getIds(ctx context.Context) (traceId, spanId string) {
+	if ctx == nil {
+		return
+	}
+	span := trace.SpanFromContext(ctx)
+	if !span.IsRecording() {
+		return
+	}
+
+	sCtx := span.SpanContext()
+
+	if sCtx.HasTraceID() {
+		traceId = sCtx.TraceID().String()
+	}
+	if sCtx.HasSpanID() {
+		spanId = sCtx.SpanID().String()
+	}
+
+	return traceId, spanId
 }
