@@ -7,11 +7,10 @@ import (
 	"net/http"
 
 	"github.com/komuw/otero/log"
-
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/metric/instrument"
+	sdkmetric "go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -76,15 +75,19 @@ func serviceA_HttpHandler(w http.ResponseWriter, r *http.Request) {
 
 	counter, _ := getMeter().Int64Counter(
 		"service_a_called_counter",
-		instrument.WithDescription("how many time the serviceA handler has been called."),
+		sdkmetric.WithDescription("how many time the serviceA handler has been called."),
 	)
+
 	counter.Add(
 		ctx,
 		1,
-		// labels/tags
-		[]attribute.KeyValue{
-			attribute.String("handler_name", "serviceA_HttpHandler"),
-			attribute.Int64("req_size", r.ContentLength),
+		[]sdkmetric.AddOption{
+			sdkmetric.WithAttributes(
+				[]attribute.KeyValue{
+					attribute.String("handler_name", "serviceA_HttpHandler"),
+					attribute.Int64("req_size", r.ContentLength),
+				}...,
+			),
 		}...,
 	)
 
@@ -96,9 +99,9 @@ func serviceA_HttpHandler(w http.ResponseWriter, r *http.Request) {
 	cli := &http.Client{
 		Transport: otelhttp.NewTransport(
 			http.DefaultTransport,
-		// If you did not set the global propagator as shown in `tracing.go`
-		// then you need to provide this one
-		// otelhttp.WithPropagators(propagator),
+			// If you did not set the global propagator as shown in `tracing.go`
+			// then you need to provide this one
+			// otelhttp.WithPropagators(propagator),
 		),
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://otero_service_b:8082/serviceB", nil)
@@ -124,7 +127,7 @@ func serviceB_HttpHandler(w http.ResponseWriter, r *http.Request) {
 
 	counter, _ := getMeter().Int64Counter(
 		"serviceB_call_counter",
-		instrument.WithDescription("how many time the serviceB handler has been called."),
+		sdkmetric.WithDescription("how many time the serviceB handler has been called."),
 	)
 	counter.Add(ctx, 1)
 

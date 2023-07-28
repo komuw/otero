@@ -14,7 +14,7 @@ var slogLogger *slog.Logger
 
 // Also see: https://github.com/jba/slog/blob/main/trace/trace.go
 
-// usage:
+// NewSlog usage:
 //
 //	ctx, span := tracer.Start(ctx, "myFuncName")
 //	l := NewSlog(ctx)
@@ -24,7 +24,7 @@ func NewSlog(ctx context.Context) *slog.Logger {
 		AddSource: true,
 		Level:     slog.LevelDebug,
 	}
-	jh := opts.NewJSONHandler(os.Stdout)
+	jh := slog.NewJSONHandler(os.Stdout, &opts)
 
 	h := otelHandler{h: jh, ctx: ctx}
 	l := slog.New(h).With("app", "my_demo_app")
@@ -109,13 +109,14 @@ func (s otelHandler) Handle(ctx context.Context, r slog.Record) error {
 		//   - If r.Time is the zero time, ignore the time.
 		//   - If an Attr's key is the empty string, ignore the Attr.
 		//
-		r.Attrs(func(a slog.Attr) {
+		r.Attrs(func(a slog.Attr) bool {
 			attrs = append(attrs,
 				attribute.KeyValue{
 					Key:   attribute.Key(a.Key),
 					Value: attribute.StringValue(a.Value.String()),
 				},
 			)
+			return true
 		})
 		// todo: add caller info.
 
