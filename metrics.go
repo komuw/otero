@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
+	"go.opentelemetry.io/otel"
 	"time"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/metric/global"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
@@ -23,7 +23,7 @@ func getMeter() metric.Meter {
 		- An optional unit of measure, for example, milliseconds or bytes.
 		- An optional description.
 	*/
-	return global.MeterProvider().Meter(
+	return otel.GetMeterProvider().Meter(
 		"instrumentation/package/name",
 		metric.WithInstrumentationVersion("0.0.1"),
 	)
@@ -88,7 +88,7 @@ func setupMetrics(ctx context.Context, serviceName string) (*sdkmetric.MeterProv
 		// 	}},
 		// )),
 	)
-	global.SetMeterProvider(mp)
+	otel.SetMeterProvider(mp)
 
 	/*
 		// https://uptrace.dev/opentelemetry/metrics.html#instruments
