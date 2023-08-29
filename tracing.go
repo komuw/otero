@@ -65,7 +65,7 @@ func setupTracing(ctx context.Context, serviceName string) (*trace.TracerProvide
 		trace.WithBatcher(exporter), // use batch in prod.
 		trace.WithResource(resource),
 		trace.WithSpanProcessor(loggingSpanProcessor{}),
-		// see: https://opentelemetry.io/docs/go/exporting_data/#sampling
+		// see: https://github.com/komuw/otero/issues/11
 		// In prod, you should consider using the TraceIDRatioBased sampler with the ParentBased sampler.
 		// sdktrace.WithSampler(sdktrace.AlwaysSample()),
 	)
