@@ -2,12 +2,12 @@ package log
 
 import (
 	"context"
+	"log/slog"
 	"os"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
-	"golang.org/x/exp/slog"
 )
 
 var slogLogger *slog.Logger
