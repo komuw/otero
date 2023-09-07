@@ -41,7 +41,7 @@ services:
   # ********************
   # Jaeger
   jaeger:
-    image: jaegertracing/all-in-one:1.41.0
+    image: jaegertracing/all-in-one:1.48.0
     command:
       - "--memory.max-traces"
       - "10000"
@@ -69,7 +69,7 @@ services:
 
   # Prometheus
   prometheus:
-    image: prom/prometheus:v2.42.0
+    image: prom/prometheus:v2.47.0
     container_name: prometheus
     command:
       - --web.console.templates=/etc/prometheus/consoles
@@ -88,7 +88,7 @@ services:
 
   # OpenTelemetry Collector
   otel_collector:
-    image: otel/opentelemetry-collector-contrib:0.70.0
+    image: otel/opentelemetry-collector-contrib:0.84.0
     command: --config=/etc/otel-collector-config.yaml
     volumes:
       - ./confs/otel-collector-config.yaml:/etc/otel-collector-config.yaml
