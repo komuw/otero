@@ -32,7 +32,7 @@ func main() {
 		}
 		defer func() {
 			err := tp.Shutdown(ctx)
-			_ = err
+			fmt.Println("error when shutting down tracingProvider. err: ", err)
 		}()
 
 		mp, err := setupMetrics(ctx, serviceName)
@@ -41,7 +41,7 @@ func main() {
 		}
 		defer func() {
 			err := mp.Shutdown(ctx)
-			_ = err
+			fmt.Println("error when shutting down metricsProvider. err: ", err)
 		}()
 	}
 
