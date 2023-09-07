@@ -30,7 +30,7 @@ Access prometheus to check on metrics:
 
 
 
-We also added integration of tracing and logs for both [https://github.com/sirupsen/logrus](logrus), [https://github.com/rs/zerolog](zerolog) & [https://pkg.go.dev/golang.org/x/exp/slog](slog);     
+We also added integration of tracing and logs for both [https://github.com/sirupsen/logrus](logrus), [https://github.com/rs/zerolog](zerolog) & [https://pkg.go.dev/log/slog](slog);     
 ```sh
 {
     "time":"2023-01-27T07:09:58.444782364Z",

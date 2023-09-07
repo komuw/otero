@@ -168,7 +168,7 @@ func add(ctx context.Context, x, y int64) int64 {
 		ls := log.NewSlog(ctx)
 		ls.Info("slog: add called. Wall with NO explicit context")
 		ls.Debug("slog: some msg", "age", 56)
-		ls.InfoCtx(ctx, "slog: call with explicit context")
+		ls.InfoContext(ctx, "slog: call with explicit context")
 	}
 
 	return x + y
