@@ -65,9 +65,17 @@ func setupTracing(ctx context.Context, serviceName string) (*trace.TracerProvide
 		trace.WithBatcher(exporter), // use batch in prod.
 		trace.WithResource(resource),
 		trace.WithSpanProcessor(loggingSpanProcessor{}),
-		// see: https://github.com/komuw/otero/issues/11
-		// In prod, you should consider using the TraceIDRatioBased sampler with the ParentBased sampler.
-		// sdktrace.WithSampler(sdktrace.AlwaysSample()),
+		trace.WithSampler(
+			// Sample 30%
+			//
+			// There's head-based sampling and tail-based sampling.
+			// Tail based sampling would enable you to say something like;
+			// `Sample 5% of success but 100% of all the errors.`
+			//
+			// What we have implemented here is head-based sampling.
+			// See: https://github.com/komuw/otero/issues/11 (and the links therein)
+			trace.ParentBased(trace.TraceIDRatioBased(0.3)),
+		),
 	)
 
 	/*
