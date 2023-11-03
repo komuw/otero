@@ -1,6 +1,9 @@
 # otel collector config.
 #
 # https://opentelemetry.io/docs/collector/configuration/
+#
+# VALIDATE & visualize config using https://www.otelbin.io/
+#
 
 # The Collector consists of three components that access telemetry data:
 # (a) Receivers
