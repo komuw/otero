@@ -12,7 +12,9 @@ import (
 
 var slogLogger *slog.Logger
 
-// Also see: https://github.com/jba/slog/blob/main/trace/trace.go
+// Also see: 
+//   1. https://github.com/jba/slog/blob/main/trace/trace.go
+//   2. https://github.com/remychantenay/slog-otel
 
 // NewSlog usage:
 //
