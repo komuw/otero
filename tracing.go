@@ -72,6 +72,8 @@ func setupTracing(ctx context.Context, serviceName string) (*trace.TracerProvide
 			// Tail based sampling would enable you to say something like;
 			// `Sample 5% of success but 100% of all the errors.`
 			//
+			// There's also filter processor that can be used in place of tail based sampling.
+			//
 			// What we have implemented here is head-based sampling.
 			// See: https://github.com/komuw/otero/issues/11 (and the links therein)
 			trace.ParentBased(trace.TraceIDRatioBased(0.3)),
