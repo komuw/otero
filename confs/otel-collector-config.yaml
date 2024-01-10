@@ -61,7 +61,7 @@ exporters:
   file/mine: # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/fileexporter
     path: /etc/otel_file_exporter.json
     rotation:
-      max_megabytes: 1 # max size in megabytes b4 rotation.
+      max_megabytes: 100 # max size in megabytes b4 rotation.
       max_backups: 2
       localtime: true
     format: json
