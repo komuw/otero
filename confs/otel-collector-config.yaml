@@ -71,10 +71,16 @@ exporters:
   #   loglevel: debug
 
   # Data sources: traces, metrics, logs
-  # otlp:
+  # otlp/name1:
   #   endpoint: otel_collector:4317
   #   headers:
   #     header1: "header-value1"
+
+  # Data sources: traces, metrics, logs
+  # otlp/datadog:
+  #   endpoint: https://example.com:4317
+  #   headers:
+  #     API_KEY: "some-value"
 
   # Data sources: traces, metrics
   # jaeger is deprecated and removed as an exporter.
