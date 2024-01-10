@@ -71,24 +71,20 @@ exporters:
   #   loglevel: debug
 
   # Data sources: traces, metrics, logs
-  # otlp/name1:
+  # otlp/some-custom-name:
   #   endpoint: otel_collector:4317
   #   headers:
   #     header1: "header-value1"
 
-  # Data sources: traces, metrics, logs
-  # otlp/datadog:
-  #   endpoint: api.example.com:4317
-  #   headers:
-  #     API_KEY: "some-value"
-
   # Data sources: traces, metrics
   # jaeger is deprecated and removed as an exporter.
   # see: https://github.com/open-telemetry/opentelemetry-specification/pull/2858
-  jaeger:
-    endpoint: jaeger:14250
-    tls:
-      insecure: true
+  # Instead, it can now speak native otlp protocol. See next section.
+  # jaeger:
+
+  # Data sources: traces, metrics, logs
+  otlp/jaeger:
+    endpoint: "jaeger:4317"
 
   # Data sources: metrics
   prometheus: # configure OpenTelemetry Collector to export data to Prometheus
@@ -118,7 +114,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [file/mine, jaeger]
+      exporters: [file/mine, otlp/jaeger]
     metrics:
       receivers: [otlp]
       processors: [memory_limiter, batch]
