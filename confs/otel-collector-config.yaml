@@ -78,7 +78,7 @@ exporters:
 
   # Data sources: traces, metrics, logs
   # otlp/datadog:
-  #   endpoint: https://example.com:4317
+  #   endpoint: api.example.com:4317
   #   headers:
   #     API_KEY: "some-value"
 
