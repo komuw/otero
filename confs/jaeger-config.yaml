@@ -6,7 +6,7 @@ collector:
   otlp:
     enabled: true # Enables OpenTelemetry OTLP receiver on dedicated HTTP and gRPC ports
     grpc:
-      host-port: "127.0.0.1:4317"
+      host-port: "0.0.0.0:4317"
       tls:
         enabled: true
         cert: /etc/tls/server.crt
