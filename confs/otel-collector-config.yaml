@@ -54,6 +54,7 @@ processors:
 # An exporter, which can be push or pull based, is how you send data to one or more destinations.
 # The list of all exporters(that can be used in collector config) is found;
 # https://opentelemetry.io/ecosystem/registry/?s=exporter&language=collector
+# https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter
 
 exporters:
   # Data sources: traces, metrics, logs
