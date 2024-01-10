@@ -1,0 +1,12 @@
+# Docs: https://www.jaegertracing.io/docs/1.53/cli/#jaeger-all-in-one
+memory.max-traces: "10000"
+query.base-path: "/jaeger/ui"
+log-level: "info"
+collector:
+  grpc:
+    tls:
+      enabled: true
+      cert: /etc/tls/server.crt
+      key: /etc/tls/server.key
+      client-ca: /etc/tls/rootCA.crt #  Path to the TLS cert to use by the server to verify a client certificate.
+

@@ -43,10 +43,11 @@ services:
   jaeger:
     image: jaegertracing/all-in-one:1.53.0
     command:
-      - "--memory.max-traces"
-      - "10000"
-      - "--query.base-path"
-      - "/jaeger/ui"
+      - "--config-file"
+      - "/etc/jaeger-config.yaml"
+    volumes:
+      - ./confs/tls:/etc/tls
+      - ./confs/jaeger-config.yaml:/etc/jaeger-config.yaml
     ports:
       # OTLP over gRPC receiver
       - "14317:4317"

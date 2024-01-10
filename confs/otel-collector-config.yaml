@@ -85,6 +85,11 @@ exporters:
   # Data sources: traces, metrics, logs
   otlp/jaeger:
     endpoint: "jaeger:4317"
+    tls:
+      # insecure: false
+      cert_file: /etc/tls/server.crt
+      key_file: /etc/tls/server.key
+      ca_file: /etc/tls/rootCA.crt        # For a client this verifies the server certificate. For a server this verifies client certificates. If empty uses system root CA.
 
   # Data sources: metrics
   prometheus: # configure OpenTelemetry Collector to export data to Prometheus
