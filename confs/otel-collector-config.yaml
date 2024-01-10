@@ -52,6 +52,8 @@ processors:
 
 # (c) Exporters
 # An exporter, which can be push or pull based, is how you send data to one or more destinations.
+# The list of all exporters(that can be used in collector config) is found;
+# https://opentelemetry.io/ecosystem/registry/?s=exporter&language=collector
 
 exporters:
   # Data sources: traces, metrics, logs
@@ -74,6 +76,8 @@ exporters:
   #     header1: "header-value1"
 
   # Data sources: traces, metrics
+  # jaeger is deprecated and removed as an exporter.
+  # see: https://github.com/open-telemetry/opentelemetry-specification/pull/2858
   jaeger:
     endpoint: jaeger:14250
     tls:
