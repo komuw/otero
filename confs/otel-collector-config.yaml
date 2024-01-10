@@ -96,14 +96,18 @@ exporters:
     endpoint: "otel_collector:9464"
 
 
-# (d) Extensions
+# (d) Connectors
+# Connectors join two pipelines, acting as both exporter and receiver.
+# A connector consumes data as an exporter at the end of one pipeline and emits data as a receiver at the beginning of another pipeline.
+
+# (e) Extensions
 # Extensions are available primarily for tasks that do not involve processing telemetry data
 # They are optional
 
 extensions:
   zpages: # Enables an HTTP endpoint with data for debugging different components that were properly instrumented for such.
 
-# (e) Service
+# (f) Service
 # The service section is used to configure what components are enabled in the Collector based on the configuration found in the receivers, processors, exporters, and extensions sections.
 # If a component is configured, but not defined within the service section then it is not enabled. 
 #  The service section consists of three sub-sections:
