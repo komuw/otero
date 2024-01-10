@@ -26,7 +26,7 @@ setup_certs(){
       -nodes \
       -x509 \
       -subj "/C=US/ST=CA/O=MyOrg/CN=myOrgCA" \
-      -addext "subjectAltName=DNS:example.com,DNS:example.net,DNS:otel_collector" \
+      -addext "subjectAltName=DNS:example.com,DNS:example.net,DNS:otel_collector,DNS:jaeger,DNS:prometheus" \
       -CA confs/tls/rootCA.crt \
       -CAkey confs/tls/rootCA.key  \
       -keyout confs/tls/server.key \
@@ -42,7 +42,7 @@ setup_certs(){
       -nodes \
       -x509 \
       -subj "/C=US/ST=CA/O=MyOrg/CN=myOrgCA" \
-      -addext "subjectAltName=DNS:example.com,DNS:example.net,DNS:otel_collector" \
+      -addext "subjectAltName=DNS:example.com,DNS:example.net,DNS:otel_collector,DNS:jaeger,DNS:prometheus" \
       -CA confs/tls/rootCA.crt \
       -CAkey confs/tls/rootCA.key  \
       -keyout confs/tls/client.key \

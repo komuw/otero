@@ -83,6 +83,7 @@ exporters:
   # jaeger:
 
   # Data sources: traces, metrics, logs
+  # jaeger has native otlp protocol support. So otel collector can just send/export to it.
   otlp/jaeger:
     endpoint: "jaeger:4317"
     tls:
