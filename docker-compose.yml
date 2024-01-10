@@ -91,9 +91,9 @@ services:
     image: otel/opentelemetry-collector-contrib:0.84.0
     command: --config=/etc/otel-collector-config.yaml
     volumes:
+      - ./confs/tls:/etc/tls
       - ./confs/otel-collector-config.yaml:/etc/otel-collector-config.yaml
       - ./confs/otel_file_exporter.json:/etc/otel_file_exporter.json
-      - ./confs/tls:/etc/tls
       # The official opentelemetry-collector-contrib container does not have a writable filesystem(its built from scratch docker image)
       # Hence, we need to add this file and make it writabe; `chmod 777 confs/file_exporter.json`
       # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/fileexporter
