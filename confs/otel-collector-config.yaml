@@ -67,8 +67,8 @@ exporters:
     format: json
 
   # Data sources: traces, metrics, logs
-  # logging:
-  #   loglevel: debug
+  # debug: # Prior to v0.86.0 use `logging` instead of `debug`
+  #   verbosity: detailed
 
   # Data sources: traces, metrics, logs
   # otlp/some-custom-name:
