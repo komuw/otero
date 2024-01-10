@@ -3,10 +3,15 @@ memory.max-traces: "10000"
 query.base-path: "/jaeger/ui"
 log-level: "info"
 collector:
-  grpc:
-    tls:
-      enabled: true
-      cert: /etc/tls/server.crt
-      key: /etc/tls/server.key
-      client-ca: /etc/tls/rootCA.crt #  Path to the TLS cert to use by the server to verify a client certificate.
-
+  otlp:
+    enabled: true # Enables OpenTelemetry OTLP receiver on dedicated HTTP and gRPC ports
+    grpc:
+      host-port: "127.0.0.1:4317"
+      tls:
+        enabled: true
+        cert: /etc/tls/server.crt
+        key: /etc/tls/server.key
+        client-ca: /etc/tls/rootCA.crt
+    # http:
+    #   host-port: "127.0.0.1:4318"
+    #   etc
