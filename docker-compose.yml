@@ -41,25 +41,18 @@ services:
   # ********************
   # Jaeger
   jaeger:
-    image: jaegertracing/all-in-one:1.48.0
+    image: jaegertracing/all-in-one:1.53.0
     command:
-      - "--memory.max-traces"
-      - "10000"
-      - "--query.base-path"
-      - "/jaeger/ui"
+      - "--config-file"
+      - "/etc/jaeger-config.yaml"
+    volumes:
+      - ./confs/tls:/etc/tls
+      - ./confs/jaeger-config.yaml:/etc/jaeger-config.yaml
     ports:
-      # Agent zipkin.thrift compact
-      - "5775:5775"
-      # Agent jaeger.thrift compact
-      - "6831:6831"
-      # Agent jaeger.thrift binary
-      - "6832:6832"
-      # Agent config HTTP
-      - "5778:5778"
-      # Collector HTTP
-      - "14268:14268"
-      # Collector gRPC
-      - "14250:14250"
+      # OTLP over gRPC receiver
+      - "14317:4317"
+      # OTLP over HTTP receiver
+      - "14318:4318"
       # Web HTTP
       - "16686:16686"
     environment:
@@ -69,7 +62,7 @@ services:
 
   # Prometheus
   prometheus:
-    image: prom/prometheus:v2.47.0
+    image: prom/prometheus:v2.48.1
     container_name: prometheus
     command:
       - --web.console.templates=/etc/prometheus/consoles
@@ -88,12 +81,12 @@ services:
 
   # OpenTelemetry Collector
   otel_collector:
-    image: otel/opentelemetry-collector-contrib:0.84.0
+    image: otel/opentelemetry-collector-contrib:0.91.0
     command: --config=/etc/otel-collector-config.yaml
     volumes:
+      - ./confs/tls:/etc/tls
       - ./confs/otel-collector-config.yaml:/etc/otel-collector-config.yaml
       - ./confs/otel_file_exporter.json:/etc/otel_file_exporter.json
-      - ./confs/tls:/etc/tls
       # The official opentelemetry-collector-contrib container does not have a writable filesystem(its built from scratch docker image)
       # Hence, we need to add this file and make it writabe; `chmod 777 confs/file_exporter.json`
       # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/fileexporter

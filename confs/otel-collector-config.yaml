@@ -52,46 +52,63 @@ processors:
 
 # (c) Exporters
 # An exporter, which can be push or pull based, is how you send data to one or more destinations.
+# The list of all exporters(that can be used in collector config) is found;
+# https://opentelemetry.io/ecosystem/registry/?s=exporter&language=collector
+# https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter
 
 exporters:
   # Data sources: traces, metrics, logs
   file/mine: # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/fileexporter
     path: /etc/otel_file_exporter.json
     rotation:
-      max_megabytes: 1 # max size in megabytes b4 rotation.
+      max_megabytes: 100 # max size in megabytes b4 rotation.
       max_backups: 2
       localtime: true
     format: json
 
   # Data sources: traces, metrics, logs
-  # logging:
-  #   loglevel: debug
+  # debug: # Prior to v0.86.0 use `logging` instead of `debug`
+  #   verbosity: detailed
 
   # Data sources: traces, metrics, logs
-  # otlp:
+  # otlp/some-custom-name:
   #   endpoint: otel_collector:4317
   #   headers:
   #     header1: "header-value1"
 
   # Data sources: traces, metrics
-  jaeger:
-    endpoint: jaeger:14250
+  # jaeger is deprecated and removed as an exporter.
+  # see: https://github.com/open-telemetry/opentelemetry-specification/pull/2858
+  # Instead, it can now speak native otlp protocol. See next section.
+  # jaeger:
+
+  # Data sources: traces, metrics, logs
+  # jaeger has native otlp protocol support. So otel collector can just send/export to it.
+  otlp/jaeger:
+    endpoint: "jaeger:4317"
     tls:
-      insecure: true
+      # insecure: false
+      cert_file: /etc/tls/server.crt
+      key_file: /etc/tls/server.key
+      ca_file: /etc/tls/rootCA.crt        # For a client this verifies the server certificate. For a server this verifies client certificates. If empty uses system root CA.
 
   # Data sources: metrics
   prometheus: # configure OpenTelemetry Collector to export data to Prometheus
     endpoint: "otel_collector:9464"
 
 
-# (d) Extensions
+# (d) Connectors
+# Connectors join two pipelines, acting as both exporter and receiver.
+# A connector consumes data as an exporter at the end of one pipeline and emits data as a receiver at the beginning of another pipeline.
+
+# (e) Extensions
 # Extensions are available primarily for tasks that do not involve processing telemetry data
 # They are optional
 
 extensions:
   zpages: # Enables an HTTP endpoint with data for debugging different components that were properly instrumented for such.
 
-# (e) Service
+# (f) Service
 # The service section is used to configure what components are enabled in the Collector based on the configuration found in the receivers, processors, exporters, and extensions sections.
 # If a component is configured, but not defined within the service section then it is not enabled. 
 #  The service section consists of three sub-sections:
@@ -107,7 +124,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [file/mine, jaeger]
+      exporters: [file/mine, otlp/jaeger]
     metrics:
       receivers: [otlp]
       processors: [memory_limiter, batch]

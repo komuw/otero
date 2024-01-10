@@ -1,0 +1,17 @@
+# Docs: https://www.jaegertracing.io/docs/1.53/cli/#jaeger-all-in-one
+memory.max-traces: "10000"
+query.base-path: "/jaeger/ui"
+log-level: "info"
+collector:
+  otlp:
+    enabled: true # Enables OpenTelemetry OTLP receiver on dedicated HTTP and gRPC ports
+    grpc:
+      host-port: "0.0.0.0:4317"
+      tls:
+        enabled: true
+        cert: /etc/tls/server.crt
+        key: /etc/tls/server.key
+        client-ca: /etc/tls/rootCA.crt
+    # http:
+    #   host-port: "127.0.0.1:4318"
+    #   etc
