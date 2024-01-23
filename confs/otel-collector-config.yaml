@@ -96,6 +96,9 @@ exporters:
   prometheus: # configure OpenTelemetry Collector to export data to Prometheus
     endpoint: "otel_collector:9464"
 
+  # Data sources: logs
+  loki:
+    endpoint: "http://loki:3100/loki/api/v1/push"
 
 # (d) Connectors
 # Connectors join two pipelines, acting as both exporter and receiver.
@@ -132,5 +135,5 @@ service:
     logs:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [file/mine]
+      exporters: [file/mine, loki]
   # telemetry: # Telemetry is where the telemetry for the collector itself can be configured.

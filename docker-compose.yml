@@ -111,6 +111,14 @@ services:
     networks:
       - teronet
 
+  loki:
+    image: grafana/loki:2.9.3
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - teronet
+
 # We create a docker network and so that otero is able to access the other containers.
 networks:
   teronet: null
