@@ -1,0 +1,21 @@
+# Docs:
+# https://grafana.com/docs/grafana/latest/datasources/
+# https://github.com/grafana/grafana/blob/v10.2.3/devenv/datasources_docker.yaml
+#
+datasources:
+- name: Prometheus
+  type: prometheus
+  access: proxy
+  url: http://prometheus:9090
+- name: Jaeger
+  type: jaeger
+  url: http://jaeger:16686
+  access: proxy
+  # basicAuth: true
+  # basicAuthUser: my_user
+- name: Loki
+  type: loki
+  access: proxy
+  url: http://loki:3100
+  # basicAuth: true
+  # basicAuthUser: my_user

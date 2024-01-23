@@ -126,7 +126,7 @@ func serviceB_HttpHandler(w http.ResponseWriter, r *http.Request) {
 	defer span.End()
 
 	counter, _ := getMeter().Int64Counter(
-		"serviceB_call_counter",
+		"service_b_called_counter",
 		sdkmetric.WithDescription("how many time the serviceB handler has been called."),
 	)
 	counter.Add(ctx, 1)
