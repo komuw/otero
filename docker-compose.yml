@@ -101,6 +101,16 @@ services:
     networks:
       - teronet
 
+  grafana:
+    image: grafana/grafana-oss:10.2.3
+    ports:
+      - 3000:3000
+    volumes:
+      - ./confs/grafana_datasources.yaml:/etc/grafana/provisioning/datasources/grafana_datasources.yaml
+      # - ./confs/grafana_dashboards.yaml:/etc/grafana/provisioning/dashboards/grafana_dashboards.yaml
+    networks:
+      - teronet
+
 # We create a docker network and so that otero is able to access the other containers.
 networks:
   teronet: null
