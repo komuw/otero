@@ -63,7 +63,7 @@ services:
   # Prometheus
   prometheus:
     image: prom/prometheus:v2.50.1
-    container_name: prometheus
+    container_name: prometheus # TODO: remove this.
     command:
       - --web.console.templates=/etc/prometheus/consoles
       - --web.console.libraries=/etc/prometheus/console_libraries

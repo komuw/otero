@@ -1,4 +1,4 @@
-# Docs: https://www.jaegertracing.io/docs/1.53/cli/#jaeger-all-in-one
+# Docs: https://www.jaegertracing.io/docs/1.55/cli/#jaeger-all-in-one
 memory.max-traces: "10000"
 query.base-path: "/jaeger/ui"
 log-level: "info"
