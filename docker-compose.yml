@@ -92,7 +92,7 @@ services:
     ports:
       - "4317:4317" # OTLP over gRPC receiver
       - "4318:4318" # OTLP over HTTP receiver
-      - "9464:9464" # Prometheus exporter
+      - "9464:9464" # Prometheus exporter. `curl -vkL http://localhost:9464/metrics`
       - "8888:8888" # metrics endpoint
     depends_on:
       - jaeger

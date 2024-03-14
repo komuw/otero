@@ -72,7 +72,7 @@ exporters:
 
   # Data sources: traces, metrics, logs
   # otlp/some-custom-name:
-  #   endpoint: otel_collector:4317
+  #   endpoint: some-ip:8723
   #   headers:
   #     header1: "header-value1"
 
@@ -93,7 +93,9 @@ exporters:
       ca_file: /etc/tls/rootCA.crt        # For a client this verifies the server certificate. For a server this verifies client certificates. If empty uses system root CA.
 
   # Data sources: metrics
-  prometheus: # configure OpenTelemetry Collector to export data to Prometheus
+  prometheus:
+    # configure OpenTelemetry Collector to export data to Prometheus
+    # The prometheus container can then scrape `http://otel_collector:9464` for metrics.
     endpoint: "otel_collector:9464"
 
 
