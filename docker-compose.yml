@@ -41,7 +41,7 @@ services:
   # ********************
   # Jaeger
   jaeger:
-    image: jaegertracing/all-in-one:1.53.0
+    image: jaegertracing/all-in-one:1.55.0
     command:
       - "--config-file"
       - "/etc/jaeger-config.yaml"
@@ -62,8 +62,7 @@ services:
 
   # Prometheus
   prometheus:
-    image: prom/prometheus:v2.48.1
-    container_name: prometheus
+    image: prom/prometheus:v2.50.0
     command:
       - --web.console.templates=/etc/prometheus/consoles
       - --web.console.libraries=/etc/prometheus/console_libraries
@@ -81,7 +80,7 @@ services:
 
   # OpenTelemetry Collector
   otel_collector:
-    image: otel/opentelemetry-collector-contrib:0.91.0
+    image: otel/opentelemetry-collector-contrib:0.96.0
     command: --config=/etc/otel-collector-config.yaml
     volumes:
       - ./confs/tls:/etc/tls
@@ -93,7 +92,7 @@ services:
     ports:
       - "4317:4317" # OTLP over gRPC receiver
       - "4318:4318" # OTLP over HTTP receiver
-      - "9464:9464" # Prometheus exporter
+      - "9464:9464" # Prometheus exporter. `curl -vkL http://localhost:9464/metrics`
       - "8888:8888" # metrics endpoint
     depends_on:
       - jaeger

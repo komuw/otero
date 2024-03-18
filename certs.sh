@@ -4,6 +4,8 @@ set -x # have bash print command been ran
 set -e # fail if any command fails
 
 setup_certs(){
+  mkdir -p confs/tls/
+
   { # create CA.
     openssl \
       req \
